@@ -1,0 +1,24 @@
+CREATE DATABASE techno_fusion;
+
+CREATE TABLE IF NOT EXISTS funcionario(
+    id INTEGER PRIMARY KEY,
+    nome CHARACTER VARYING(100) NOT NULL,
+    sexo CHAR(1) NOT NULL,
+    data_nascimento DATE NOT NULL,
+    email CHARACTER UNIQUE VARYING(100) NOT NULL,
+    salario NUMERIC(10, 2) NOT NULL,
+    imagem TEXT,
+    perfil CHARACTER VARYING(30) NOT NULL,
+    login CHARACTER VARYING(30) UNIQUE NOT NULL,
+    senha CHARACTER VARYING(50) NOT NULL
+);
+
+
+CREATE SEQUENCE IF NOT EXISTS funcionario_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+
+ALTER TABLE funcionario ALTER COLUMN id SET DEFAULT nextval('funcionario_id_seq'::regclass);
