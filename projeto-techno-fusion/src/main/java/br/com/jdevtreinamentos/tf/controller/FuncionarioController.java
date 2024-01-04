@@ -5,13 +5,22 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.tomcat.util.codec.binary.Base64;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import br.com.jdevtreinamentos.tf.controller.infra.ResponseEntity;
 import br.com.jdevtreinamentos.tf.controller.infra.StatusResposta;
@@ -31,7 +40,8 @@ import br.com.jdevtreinamentos.tf.util.GeradorSenha;
  * @version 0.2 2023-12-30
  */
 
-@WebServlet("/funcionario")
+@MultipartConfig
+@WebServlet(urlPatterns = { "/funcionario", "/funcionario/editar" })
 public class FuncionarioController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -48,7 +58,32 @@ public class FuncionarioController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		encaminharParaPaginaFuncionarios(request, response);
+		if (request.getServletPath().endsWith("editar")) {
+			String idString = request.getParameter("id");
+
+			if (idString != null && !idString.trim().isEmpty()) {
+				Long id = Long.parseLong(idString);
+
+				Optional<Funcionario> optional = daoFuncionario.buscarPorId(id);
+
+				if (optional.isPresent()) {
+					ObjectMapper mapper = JsonMapper.builder().findAndAddModules().build();
+
+					String json = mapper.writeValueAsString(optional.get());
+
+					response.getWriter().write(json);
+					response.setContentType("application/json");
+				} else {
+					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					response.getWriter().write("Erro: não foi possível encontrar o funcionário #" + id);
+					response.setContentType("text/plain");
+				}
+			}
+
+		} else {
+			encaminharParaPaginaFuncionarios(request, response);
+		}
+
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -64,38 +99,54 @@ public class FuncionarioController extends HttpServlet {
 			String email = request.getParameter("email");
 			Double salario = Double.parseDouble(
 					request.getParameter("salario").replace("R$ ", "").replaceAll("\\.", "").replace(",", "."));
-			String imagem = request.getParameter("imagem");
 			PerfilFuncionario perfil = PerfilFuncionario.toEnum(request.getParameter("perfil"));
 			String login = request.getParameter("login");
 
-			funcionario = new Funcionario();
-			if (idTexto != null && !idTexto.trim().isEmpty()) {
-				funcionario.setId(Long.parseLong(idTexto));
-			}
+			String imgArmazenadaNaPagina = request.getParameter("imagemArmazenada");
 
+			funcionario = new Funcionario();
 			funcionario.setNome(nome);
 			funcionario.setSexo(sexo);
 			funcionario.setDataNascimento(dataNascimento);
 			funcionario.setEmail(email);
 			funcionario.setSalario(salario);
-			funcionario.setImagem(imagem);
 			funcionario.setPerfil(perfil);
 			funcionario.setLogin(login);
 
+			if (idTexto != null && !idTexto.trim().isEmpty()) {
+				funcionario.setId(Long.parseLong(idTexto));
+			}
+
+			Part imagemPart = request.getPart("imagem");
+			if (imagemPart != null && imagemPart.getSize() > 0) {
+				byte[] imagemByte = IOUtils.toByteArray(imagemPart.getInputStream());
+				String extensao = imagemPart.getContentType().split("/")[1];
+
+				String imagemBase64 = new Base64().encodeAsString(imagemByte);
+
+				String imagem = "data:image/" + extensao + ";base64," + imagemBase64;
+				funcionario.setImagem(imagem);
+
+			} else if (imgArmazenadaNaPagina != null && !imgArmazenadaNaPagina.trim().isEmpty()) {
+				funcionario.setImagem(imgArmazenadaNaPagina);
+			}
+
 			validarDados(funcionario);
+
+			ResponseEntity<Funcionario> resposta = gerarReposta(Funcionario.class, StatusResposta.SUCCESS, null, "");
 
 			if (funcionario.isNovo()) {
 				String senhaGerada = GeradorSenha.gerar(funcionario);
 				funcionario.setSenha(senhaGerada);
 
 				daoFuncionario.salvar(funcionario);
-
-				ResponseEntity<Funcionario> resposta = gerarReposta(Funcionario.class, StatusResposta.SUCCESS, null,
-						"Funcionário inserido com sucesso!");
-				request.getSession().setAttribute("resposta", resposta);
+				resposta.setMensagem("Funcionário inserido com sucesso!");
 			} else {
-
+				daoFuncionario.salvar(funcionario);
+				resposta.setMensagem("Funcionário atualizado com sucesso!");
 			}
+
+			request.getSession().setAttribute("resposta", resposta);
 
 			response.sendRedirect("funcionario/display");
 
@@ -108,33 +159,25 @@ public class FuncionarioController extends HttpServlet {
 		}
 	}
 
-	private void encaminhar(HttpServletRequest request, HttpServletResponse response, String caminho) {
-		try {
-			RequestDispatcher encaminhador = request.getRequestDispatcher(caminho);
-			encaminhador.forward(request, response);
-		} catch (ServletException | IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	private void encaminharParaPaginaFuncionarios(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			RequestDispatcher encaminhador = request.getRequestDispatcher("/view/admin/funcionarios.jsp");
 			request.setAttribute("tipoSexo", EnumSexo.values());
 			request.setAttribute("perfilFuncionario", PerfilFuncionario.values());
+			request.setAttribute("listaFuncionarios", daoFuncionario.obterListPreview());
 
 			encaminhador.forward(request, response);
 		} catch (ServletException | IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private <T> ResponseEntity<T> gerarReposta(Class<T> tipoRetorno, StatusResposta status, T artefato,
 			String mensagem) {
 		ResponseEntity<T> resposta = new ResponseEntity<>(status, artefato, mensagem);
 		return resposta;
 	}
-	
+
 	private boolean validarDados(Funcionario funcionario) {
 		if (funcionario == null) {
 			return false;
@@ -155,8 +198,14 @@ public class FuncionarioController extends HttpServlet {
 					+ QTD_MIN_CARACTERES_LOGIN + " e no máximo " + QTD_MAX_CARACTERES_LOGIN + " caracteres");
 		}
 
-		if (daoFuncionario.loginExiste(funcionario.getLogin())) {
-			throw new DadosInvalidosException("O login já existe no banco, digite outro!");
+		if (funcionario.isNovo()) {
+			if (daoFuncionario.loginExiste(funcionario.getLogin())) {
+				throw new DadosInvalidosException("O login já existe no banco, digite outro!");
+			}
+		} else {
+			if (daoFuncionario.loginExisteUpdate(funcionario.getId(), funcionario.getLogin())) {
+				throw new DadosInvalidosException("O login já existe no banco, digite outro!");
+			}
 		}
 
 		return true;

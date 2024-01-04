@@ -15,6 +15,7 @@
   <!-- Nucleo Icons -->
   <link href="assets/css/nucleo-icons.css" rel="stylesheet" />
   <link href="<%=contexto%>assets/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="<%=contexto%>assets/css/preloader.css" rel="stylesheet" />
   <!-- Font Awesome Icons -->
   <script src="https://kit.fontawesome.com/349ee9c857.js" crossorigin="anonymous"></script>
   <link href="<%=contexto%>assets/css/nucleo-svg.css" rel="stylesheet" />

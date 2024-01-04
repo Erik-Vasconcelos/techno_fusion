@@ -14,6 +14,7 @@ import br.com.jdevtreinamentos.tf.infrastructure.connection.FabricaConexao;
 import br.com.jdevtreinamentos.tf.infrastructure.dao.service.EntidadeGenericaDAO;
 import br.com.jdevtreinamentos.tf.model.Funcionario;
 import br.com.jdevtreinamentos.tf.model.enumeration.EnumSexo;
+import br.com.jdevtreinamentos.tf.model.enumeration.PerfilFuncionario;
 
 /**
  * Classe que implementa o padrão de projeto Data Acess Object - DAO que separa
@@ -40,27 +41,58 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 	public Funcionario salvar(Funcionario entidade) {
 		Optional<Funcionario> optional = Optional.empty();
 		try {
-			String sql = "INSERT INTO funcionario(nome, sexo, data_nascimento, email, salario, perfil, login, senha)"
-					+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-			stmt = conexao.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-			stmt.setString(1, entidade.getNome());
-			stmt.setString(2, entidade.getSexo().getSigla());
-			stmt.setDate(3, Date.valueOf(entidade.getDataNascimento()));
-			stmt.setString(4, entidade.getEmail());
-			stmt.setDouble(5, entidade.getSalario());
-			stmt.setString(6, entidade.getPerfil().name());
-			stmt.setString(7, entidade.getLogin());
-			stmt.setString(8, entidade.getSenha());
+			String sql = "";
+			if (entidade.isNovo()) {
 
-			stmt.execute();
-			FabricaConexao.connectionCommit();
+				sql = "INSERT INTO funcionario(nome, sexo, data_nascimento, email, salario, perfil, login, senha)"
+						+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+				stmt = conexao.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+				stmt.setString(1, entidade.getNome());
+				stmt.setString(2, entidade.getSexo().getSigla());
+				stmt.setDate(3, Date.valueOf(entidade.getDataNascimento()));
+				stmt.setString(4, entidade.getEmail());
+				stmt.setDouble(5, entidade.getSalario());
+				stmt.setString(6, entidade.getPerfil().name());
+				stmt.setString(7, entidade.getLogin());
+				stmt.setString(8, entidade.getSenha());
 
-			ResultSet resultado = stmt.getGeneratedKeys();
+				stmt.execute();
+				FabricaConexao.connectionCommit();
 
-			boolean temProximo = resultado.next();
+				ResultSet resultado = stmt.getGeneratedKeys();
 
-			if (temProximo) {
-				optional = buscarPorId(resultado.getLong("id"));
+				boolean temProximo = resultado.next();
+
+				if (temProximo) {
+					optional = buscarPorId(resultado.getLong("id"));
+
+					entidade.setId(optional.get().getId());
+
+					if (entidade.getImagem() != null && !entidade.getImagem().trim().isEmpty()) {
+						salvarImagem(entidade);
+					}
+				}
+
+			} else {
+				sql = "UPDATE FUNCIONARIO SET nome=?, sexo=?, data_nascimento=?, email=?, salario=?, perfil=?, login=? WHERE id=?";
+				stmt = conexao.prepareStatement(sql);
+				stmt.setString(1, entidade.getNome());
+				stmt.setString(2, entidade.getSexo().getSigla());
+				stmt.setDate(3, Date.valueOf(entidade.getDataNascimento()));
+				stmt.setString(4, entidade.getEmail());
+				stmt.setDouble(5, entidade.getSalario());
+				stmt.setString(6, entidade.getPerfil().name());
+				stmt.setString(7, entidade.getLogin());
+				stmt.setLong(8, entidade.getId());
+
+				stmt.executeUpdate();
+				FabricaConexao.connectionCommit();
+
+				if (entidade.getImagem() != null && !entidade.getImagem().trim().isEmpty()) {
+					salvarImagem(entidade);
+				}
+				
+				optional = buscarPorId(entidade.getId());
 			}
 
 		} catch (SQLException e) {
@@ -71,11 +103,11 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 		return optional.orElse(new Funcionario());
 	}
 
-	public void salvarImagem(Funcionario funcionario, String imagem) {
+	public void salvarImagem(Funcionario funcionario) {
 		try {
 			String sql = "UPDATE funcionario SET imagem = ? WHERE id = ?";
 			stmt = conexao.prepareStatement(sql);
-			stmt.setString(1, imagem);
+			stmt.setString(1, funcionario.getImagem());
 			stmt.setLong(2, funcionario.getId());
 
 			stmt.execute();
@@ -94,7 +126,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 
 		Optional<Funcionario> optional = Optional.empty();
 		try {
-			String sql = "SELECT f.id, f.nome, f.sexo, f.data_nascimento, f.email, f.salario, f.imagem, f.login FROM Funcionario f WHERE id = ?";
+			String sql = "SELECT f.id, f.nome, f.sexo, f.data_nascimento, f.perfil, f.email, f.salario, f.imagem, f.login FROM Funcionario f WHERE id = ?";
 			stmt = conexao.prepareStatement(sql);
 			stmt.setLong(1, id);
 
@@ -107,6 +139,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 				funcionario.setNome(resultado.getString("nome"));
 				funcionario.setSexo(EnumSexo.toEnumBySigla(resultado.getString("sexo")));
 				funcionario.setDataNascimento(resultado.getDate("data_nascimento").toLocalDate());
+				funcionario.setPerfil(PerfilFuncionario.toEnum(resultado.getString("perfil")));
 				funcionario.setEmail(resultado.getString("email"));
 				funcionario.setSalario(resultado.getDouble("salario"));
 				funcionario.setImagem(resultado.getString("imagem"));
@@ -127,7 +160,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 	public List<Funcionario> obterTodos() {
 		List<Funcionario> funcionarios = new ArrayList<>();
 		try {
-			String sql = "SELECT f.id, f.nome, f.sexo, f.data_nascimemto, f.email, f.salario, f.imagem, f.login FROM Funcionario f";
+			String sql = "SELECT f.id, f.nome, f.sexo, f.data_nascimento, f.email, f.perfil, f.salario, f.imagem, f.login FROM funcionario f";
 			stmt = conexao.prepareStatement(sql);
 
 			ResultSet resultado = stmt.executeQuery();
@@ -137,12 +170,42 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 				Funcionario funcionario = new Funcionario();
 				funcionario.setId(resultado.getLong("id"));
 				funcionario.setNome(resultado.getString("nome"));
-				funcionario.setSexo(EnumSexo.toEnum(resultado.getString("sexo")));
+				funcionario.setSexo(EnumSexo.toEnumBySigla(resultado.getString("sexo")));
 				funcionario.setDataNascimento(resultado.getDate("data_nascimento").toLocalDate());
 				funcionario.setEmail(resultado.getString("email"));
 				funcionario.setSalario(resultado.getDouble("salario"));
+				funcionario.setPerfil(PerfilFuncionario.toEnum(resultado.getString("perfil")));
 				funcionario.setImagem(resultado.getString("imagem"));
 				funcionario.setLogin(resultado.getString("login"));
+
+				funcionarios.add(funcionario);
+			}
+
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
+
+		return funcionarios;
+	}
+
+	public List<Funcionario> obterListPreview() {
+		List<Funcionario> funcionarios = new ArrayList<>();
+		try {
+			String sql = "SELECT f.id, f.nome, f.sexo, f.email, f.perfil, f.salario FROM funcionario f limit 10";
+			stmt = conexao.prepareStatement(sql);
+
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
+
+			while (resultado.next()) {
+				Funcionario funcionario = new Funcionario();
+				funcionario.setId(resultado.getLong("id"));
+				funcionario.setNome(resultado.getString("nome"));
+				funcionario.setSexo(EnumSexo.toEnumBySigla(resultado.getString("sexo")));
+				funcionario.setEmail(resultado.getString("email"));
+				funcionario.setSalario(resultado.getDouble("salario"));
+				funcionario.setPerfil(PerfilFuncionario.toEnum(resultado.getString("perfil")));
 
 				funcionarios.add(funcionario);
 			}
@@ -169,7 +232,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 
 			stmt.execute();
 			FabricaConexao.connectionCommit();
-			
+
 		} catch (SQLException e) {
 			FabricaConexao.connectionRollback();
 			e.printStackTrace();
@@ -187,7 +250,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 
 			ResultSet resultado = stmt.executeQuery();
 			FabricaConexao.connectionCommit();
-			
+
 			if (resultado.next()) {
 				return resultado.getBoolean("loginExiste");
 			}
@@ -196,7 +259,30 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 			FabricaConexao.connectionRollback();
 			e.printStackTrace();
 		}
-		
+
+		return false;
+	}
+	
+	public boolean loginExisteUpdate(Long id, String login) {
+		try {
+			String sql = "SELECT COUNT(id) > 0 AS loginUpdateExiste FROM funcionario WHERE login = ? AND id != ?";
+
+			PreparedStatement stmt = conexao.prepareStatement(sql);
+			stmt.setString(1, login);
+			stmt.setLong(2, id);
+
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
+
+			if (resultado.next()) {
+				return resultado.getBoolean("loginUpdateExiste");
+			}
+
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
+
 		return false;
 	}
 

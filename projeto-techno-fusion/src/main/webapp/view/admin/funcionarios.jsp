@@ -1,9 +1,15 @@
+<%@page import="br.com.jdevtreinamentos.tf.model.Funcionario"%>
+<%@page
+	import="br.com.jdevtreinamentos.tf.controller.infra.ResponseEntity"%>
 <%@page
 	import="br.com.jdevtreinamentos.tf.controller.infra.StatusResposta"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%
+String contexto = request.getContextPath() + "/view/admin/";
+%>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -18,17 +24,21 @@
 
 		<c:if test="${not empty resposta.mensagem}">
 			<c:if test="${resposta.status.codigo == 1}">
-				<div class="alert alert-success">${resposta.mensagem}</div>
+				<div class="alert alert-success" id="box-msg">${resposta.mensagem}</div>
 			</c:if>
 
 			<c:if test="${resposta.status.codigo == 2}">
-				<div class="alert alert-warning">${resposta.mensagem}</div>
+				<div class="alert alert-warning" id="box-msg">${resposta.mensagem}</div>
 			</c:if>
 
 			<c:if test="${resposta.status.codigo == 3}">
-				<div class="alert alert-danger">${resposta.mensagem}</div>
+				<div class="alert alert-danger" id="box-msg">${resposta.mensagem}</div>
 			</c:if>
 		</c:if>
+
+		<div class="preloader-container" id="preloader">
+    		<div class="loader"></div>
+		</div>
 
 		<nav
 			class="navbar navbar-main navbar-expand-lg mx-5 px-0 shadow-none rounded"
@@ -215,46 +225,162 @@
 			</div>
 			<hr class="my-0">
 			<div class="row mt-3">
+
 				<nav>
 					<div class="nav nav-tabs" id="nav-tab" role="tablist">
 						<button class="nav-link active" id="nav-home-tab"
-							data-bs-toggle="tab" data-bs-target="#tab-cadastro" type="button"
-							role="tab" aria-controls="nav-home" aria-selected="true">Cadastro</button>
+							data-bs-toggle="tab" data-bs-target="#nav-home" type="button"
+							role="tab" aria-controls="nav-home" aria-selected="true">Funcionários</button>
 						<button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab"
-							data-bs-target="#tab-funcionarios" type="button" role="tab"
-							aria-controls="nav-profile" aria-selected="false">Funcionários</button>
+							data-bs-target="#nav-profile" type="button" role="tab"
+							aria-controls="nav-profile" aria-selected="false">Cadastro</button>
 					</div>
 				</nav>
 				<div class="tab-content" id="nav-tabContent">
-					<div class="col-12 tab-pane fade show active" id="tab-cadastro"
-						role="tabpanel" aria-labelledby="cadastro-tab">
+					<div class="tab-pane show active" id="nav-home" role="tabpanel"
+						aria-labelledby="nav-home-tab" tabindex="0">
 						<div class="card border shadow-xs mb-4">
 							<div class="card-header border-bottom pb-0">
 								<div class="d-sm-flex align-items-center">
 									<div>
-										<h6 class="font-weight-semibold text-lg mb-0">Novo
+										<h6 class="font-weight-semibold text-lg mb-2">Funcionários
+											cadastrados</h6>
+									</div>
+								</div>
+							</div>
+							<div class="card-body px-0 py-0">
+								<div
+									class="border-bottom py-2 px-3 d-sm-flex align-items-center">
+									<div class="input-group w-sm-25 ms-auto">
+										<span class="input-group-text text-body"> <svg
+												xmlns="http://www.w3.org/2000/svg" width="16px"
+												height="16px" fill="none" viewBox="0 0 24 24"
+												stroke-width="1.5" stroke="currentColor">
+							  <path stroke-linecap="round" stroke-linejoin="round"
+													d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
+							</svg>
+										</span> <input type="text" class="form-control" placeholder="Search">
+									</div>
+								</div>
+								<div class="table-responsive p-0">
+									<table class="table align-items-center mb-0">
+										<thead class="bg-gray-100">
+											<tr>
+												<th
+													class="text-secondary text-xs font-weight-semibold opacity-7">Nome</th>
+												<th
+													class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">Sexo</th>
+												<th
+													class="text-center text-secondary text-xs font-weight-semibold opacity-7">Perfil</th>
+												<th
+													class="text-center text-secondary text-xs font-weight-semibold opacity-7">Salário</th>
+												<th class="text-secondary opacity-7"></th>
+											</tr>
+										</thead>
+										<tbody>
+											<c:forEach items="${listaFuncionarios}" var="f">
+												<tr>
+													<td>
+														<div class="d-flex px-2 py-1">
+															<div
+																class="d-flex flex-column justify-content-center ms-1">
+																<h6 class="mb-0 text-sm font-weight-semibold">${f.nome}</h6>
+																<p class="text-sm text-secondary mb-0">${f.email}</p>
+															</div>
+														</div>
+													</td>
+													<td><span
+														class="text-secondary text-sm font-weight-normal">${f.sexo.descricao}</span>
+													</td>
+													<td class="align-middle text-center text-sm">
+														<p class="text-sm text-dark font-weight-semibold mb-0">${f.perfil.descricao}</p>
+
+													</td>
+													<td class="align-middle text-center"><span
+														class="badge badge-sm border border-success text-sm font-weight-semibold mb-0 text-success bg-success">R$
+															${f.salario}</span></td>
+													<td class="align-middle"><a onclick="editar(this)" id="${f.id}"
+														class="text-secondary font-weight-bold text-xs"
+														data-bs-toggle="tooltip"
+														data-bs-title="Editar funcionario"> <svg width="20"
+																height="20" viewBox="0 0 21 22" fill="none"
+																xmlns="http://www.w3.org/2000/svg">
+									<path
+																	d="M11.2201 2.02495C10.8292 1.63482 10.196 1.63545 9.80585 2.02636C9.41572 2.41727 9.41635 3.05044 9.80726 3.44057L11.2201 2.02495ZM12.5572 6.18502C12.9481 6.57516 13.5813 6.57453 13.9714 6.18362C14.3615 5.79271 14.3609 5.15954 13.97 4.7694L12.5572 6.18502ZM11.6803 1.56839L12.3867 2.2762L12.3867 2.27619L11.6803 1.56839ZM14.4302 4.31284L15.1367 5.02065L15.1367 5.02064L14.4302 4.31284ZM3.72198 15V16C3.98686 16 4.24091 15.8949 4.42839 15.7078L3.72198 15ZM0.999756 15H-0.000244141C-0.000244141 15.5523 0.447471 16 0.999756 16L0.999756 15ZM0.999756 12.2279L0.293346 11.5201C0.105383 11.7077 -0.000244141 11.9624 -0.000244141 12.2279H0.999756ZM9.80726 3.44057L12.5572 6.18502L13.97 4.7694L11.2201 2.02495L9.80726 3.44057ZM12.3867 2.27619C12.7557 1.90794 13.3549 1.90794 13.7238 2.27619L15.1367 0.860593C13.9869 -0.286864 12.1236 -0.286864 10.9739 0.860593L12.3867 2.27619ZM13.7238 2.27619C14.0917 2.64337 14.0917 3.23787 13.7238 3.60504L15.1367 5.02064C16.2875 3.8721 16.2875 2.00913 15.1367 0.860593L13.7238 2.27619ZM13.7238 3.60504L3.01557 14.2922L4.42839 15.7078L15.1367 5.02065L13.7238 3.60504ZM3.72198 14H0.999756V16H3.72198V14ZM1.99976 15V12.2279H-0.000244141V15H1.99976ZM1.70617 12.9357L12.3867 2.2762L10.9739 0.86059L0.293346 11.5201L1.70617 12.9357Z"
+																	fill="#64748B" />
+								  </svg>
+													</a></td>
+												</tr>
+											</c:forEach>
+
+										</tbody>
+									</table>
+								</div>
+								<div class="border-top py-3 px-3 d-flex align-items-center">
+									<p class="font-weight-semibold mb-0 text-dark text-sm">Page
+										1 of 10</p>
+									<div class="ms-auto">
+										<button class="btn btn-sm btn-white mb-0">Previous</button>
+										<button class="btn btn-sm btn-white mb-0">Next</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane" id="nav-profile" role="tabpanel"
+						aria-labelledby="nav-profile-tab" tabindex="0">
+						<div class="card border shadow-xs mb-4">
+							<div class="card-header border-bottom pb-0">
+								<div class="d-sm-flex align-items-center">
+									<div>
+										<h6 class="font-weight-semibold text-lg mb-0" id="titulo-tab">Novo
 											funcionário</h6>
-										<p class="text-sm">Informe os dados do funcionário para
-											cadastrá-lo no sistema</p>
+										<p class="text-sm" id="info-tab">Informe os dados do
+											funcionário para cadastrá-lo no sistema</p>
 									</div>
 
 								</div>
 							</div>
 
 							<div class="mt-2 px-3">
-								<form action="<%=request.getContextPath() + "/funcionario"%>"
-									method="post">
+								<form enctype="multipart/form-data" onsubmit="false"
+									action="<%=request.getContextPath() + "/funcionario"%>"
+									method="post" id="formFuncionario">
+
+									<input type="hidden" value="${resposta.status.codigo}" id="cod-msg">
+									<input type="hidden" value="${resposta.artefato.imagem}" id="imagemArmazenada" name="imagemArmazenada">
 
 									<div class="form-group">
-
-										<label for="example-text-input" class="form-control-label">Id</label>
-										<input class="form-control" type="number" readonly="readonly"
-											value="" id="id" name="id">
+										<label for="id" class="form-control-label">Id</label> <input
+											class="form-control" type="number" readonly="readonly"
+											value="${resposta.artefato.id}" id="id" name="id">
 									</div>
 									<div class="form-group">
-										<label for="example-text-input" class="form-control-label">Nome</label>
-										<input class="form-control" type="text" required="required"
+										<label for="nome" class="form-control-label">Nome</label> <input
+											class="form-control" type="text" required="required"
 											value="${resposta.artefato.nome}" id="nome" name="nome">
+									</div>
+
+									<div class="form-group">
+										<c:choose>
+											<c:when test="${not empty resposta.artefato.imagem}">
+												<img src="" class="rounded"
+													alt="Imagem funcionário" style="width: 200px; height: 200px; object-fit: cover;" id="box-img">
+											</c:when>
+
+											<c:otherwise>
+												<img src="<%=contexto%>assets/img/usuario.png"
+													class="rounded" alt="Imagem funcionário" id="box-img"
+													style="width: 200px; height: 200px; object-fit: cover;">
+											</c:otherwise>
+										</c:choose>
+									</div>
+
+									<div class="form-group">
+										<label for="imagem" class="form-control-label">Imagem</label>
+										<input class="form-control" type="file" accept="image/*"
+											value="${resposta.artefato.imagem}" id="input-imagem"
+											name="imagem" onchange="previewImage()">
 									</div>
 
 									<label class="form-control-label">Sexo</label>
@@ -262,55 +388,96 @@
 
 										<%int count = 1;%>
 										<c:forEach items="${tipoSexo}" var="s">
-											<input class="form-check-input" type="radio"
-												value="${s.name()}" required="required" name="sexo"
-												id="radioSexo<%=count%>"
-												<%if(count == 1){ out.print("checked"); count ++;}%>>
-											<label class="custom-control-label"
-												for="radioSexo<%=count++%>">${s.descricao}</label>
-											<br>
+
+											<c:choose>
+												<c:when test="${empty resposta.artefato.sexo}">
+													<input class="form-check-input" type="radio"
+														value="${s.name()}" required="required" name="sexo"
+														id="radioSexo<%=count%>" <%if(count == 1){ out.print("checked"); count ++;}%>>
+													<label class="custom-control-label"
+														for="radioSexo<%=count++%>">${s.descricao}</label>
+													<br>
+												</c:when>
+
+												<c:otherwise>
+													<c:choose>
+														<c:when
+															test="${s.name() eq resposta.artefato.sexo.name()}">
+															<input class="form-check-input" type="radio"
+																value="${s.name()}" required="required" name="sexo"
+																id="radioSexo<%=count%>" checked="checked">
+															<label class="custom-control-label"
+																for="radioSexo<%=count++%>">${s.descricao}</label>
+															<br>
+														</c:when>
+
+														<c:otherwise>
+															<input class="form-check-input" type="radio"
+																value="${s.name()}" required="required" name="sexo"
+																id="radioSexo<%=count%>">
+															<label class="custom-control-label"
+																for="radioSexo<%=count++%>">${s.descricao}</label>
+															<br>
+														</c:otherwise>
+
+													</c:choose>
+												</c:otherwise>
+
+											</c:choose>
+
 										</c:forEach>
 
 									</div>
 
 									<div class="form-group">
-										<label for="example-date-input" class="form-control-label">Data
+										<label for="dataNascimento" class="form-control-label">Data
 											de nascimento</label> <input class="form-control" type="date"
 											value="${resposta.artefato.dataNascimento}"
 											required="required" id="dataNascimento" name="dataNascimento">
 									</div>
 
 									<div class="form-group">
-										<label for="example-email-input" class="form-control-label">Email</label>
-										<input class="form-control" type="email" required="required"
+										<label for="email" class="form-control-label">Email</label> <input
+											class="form-control" type="email" required="required"
 											value="${resposta.artefato.email}" id="email" name="email">
 									</div>
 
 									<div class="form-group">
-										<label for="example-text-input" class="form-control-label">Salário</label>
+										<label for="salario" class="form-control-label">Salário</label>
 										<input class="form-control" type="text" required="required"
 											value="${resposta.artefato.salario}" id="salario"
 											name="salario">
 									</div>
 
 									<div class="form-group">
-										<label for="exampleFormControlSelect1">Perfil</label> <select
+										<label for="perfil">Perfil</label> <select
 											class="form-control" id="perfil" name="perfil"
 											required="required">
 											<c:forEach items="${perfilFuncionario}" var="p">
-												<option value="${p.name()}">${p.descricao}</option>
+
+												<c:choose>
+													<c:when
+														test="${p.name() eq resposta.artefato.perfil.name()}">
+														<option selected="selected" value="${p.name()}">${p.descricao}</option>
+													</c:when>
+
+													<c:otherwise>
+														<option value="${p.name()}">${p.descricao}</option>
+													</c:otherwise>
+												</c:choose>
+
 											</c:forEach>
 										</select>
 									</div>
 
 									<div class="form-group">
-										<label for="example-text-input" class="form-control-label">Login</label>
-										<input class="form-control" type="text" required="required"
+										<label for="login" class="form-control-label">Login</label> <input
+											class="form-control" type="text" required="required"
 											value="${resposta.artefato.login}" id="login" name="login"
 											minlength="5" maxlength="8">
 									</div>
 
-									<div class="form-group">
+									<div class="form-group" id="groupSenha">
 										<label for="senha" class="form-control-label">Senha</label> <input
 											class="form-control" type="text" readonly="readonly"
 											value="A senha é gereda automáticamente: email + login (exemplo@gmail.com20230415)"
@@ -318,10 +485,15 @@
 									</div>
 
 									<div class="card-body px-0 py-2">
-										<div class="ms-auto">
-											<input type="submit"
-												class="btn btn-sm btn-dark btn-icon d-flex align-items-center me-2"
-												value="Salvar">
+										<div class="ms-auto d-flex align-items-center"
+											id="btn-acoes-form">
+											<%-- <input type="submit" class="btn btn-success me-2"
+												value="Salvar"> --%>
+											<button type="button" class="btn btn-success me-2"
+                                                onclick="enviarForm()">Salvar</button>
+
+											<button type="button" class="btn btn-info me-2"
+												onclick="restaurarTab()">Novo funcionário</button>
 										</div>
 									</div>
 
@@ -333,300 +505,8 @@
 					</div>
 				</div>
 
-				<div class="col-12 tab-pane fade" id="tab-funcionarios"
-					role="tabpanel" aria-labelledby="funcionarios-tab">
-					<div class="card border shadow-xs mb-4">
-						<div class="card-header border-bottom pb-0">
-							<div class="d-sm-flex align-items-center">
-								<div>
-									<h6 class="font-weight-semibold text-lg mb-0">Novo
-										funcionario</h6>
-									<p class="text-sm">Informe os dados do funcionario para
-										cadastrá-lo no sistema</p>
-								</div>
-								<div class="ms-auto d-flex">
-									<button type="button" class="btn btn-sm btn-white me-2">
-										View all</button>
-									<button type="button"
-										class="btn btn-sm btn-dark btn-icon d-flex align-items-center me-2">
-										<span class="btn-inner--icon"> <svg width="16"
-												height="16" xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 24 24" fill="currentColor" class="d-block me-2">
-                            <path
-													d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z" />
-                          </svg>
-										</span> <span class="btn-inner--text">Add member</span>
-									</button>
-								</div>
-							</div>
-						</div>
-						<div class="card-body px-0 py-0">
-							<div class="border-bottom py-3 px-3 d-sm-flex align-items-center">
-								<div class="btn-group" role="group"
-									aria-label="Basic radio toggle button group">
-									<input type="radio" class="btn-check" name="btnradiotable"
-										id="btnradiotable1" autocomplete="off" checked> <label
-										class="btn btn-white px-3 mb-0" for="btnradiotable1">All</label>
-									<input type="radio" class="btn-check" name="btnradiotable"
-										id="btnradiotable2" autocomplete="off"> <label
-										class="btn btn-white px-3 mb-0" for="btnradiotable2">Monitored</label>
-									<input type="radio" class="btn-check" name="btnradiotable"
-										id="btnradiotable3" autocomplete="off"> <label
-										class="btn btn-white px-3 mb-0" for="btnradiotable3">Unmonitored</label>
-								</div>
-								<div class="input-group w-sm-25 ms-auto">
-									<span class="input-group-text text-body"> <svg
-											xmlns="http://www.w3.org/2000/svg" width="16px" height="16px"
-											fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-											stroke="currentColor">
-                          <path stroke-linecap="round"
-												stroke-linejoin="round"
-												d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
-                        </svg>
-									</span> <input type="text" class="form-control" placeholder="Search">
-								</div>
-							</div>
-							<div class="table-responsive p-0">
-								<table class="table align-items-center mb-0">
-									<thead class="bg-gray-100">
-										<tr>
-											<th
-												class="text-secondary text-xs font-weight-semibold opacity-7">Member</th>
-											<th
-												class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">Function</th>
-											<th
-												class="text-center text-secondary text-xs font-weight-semibold opacity-7">Status</th>
-											<th
-												class="text-center text-secondary text-xs font-weight-semibold opacity-7">Employed</th>
-											<th class="text-secondary opacity-7"></th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<td>
-												<div class="d-flex px-2 py-1">
-													<div class="d-flex align-items-center">
-														<img src="assets/img/team-2.jpg"
-															class="avatar avatar-sm rounded-circle me-2" alt="user1">
-													</div>
-													<div class="d-flex flex-column justify-content-center ms-1">
-														<h6 class="mb-0 text-sm font-weight-semibold">John
-															Michael</h6>
-														<p class="text-sm text-secondary mb-0">john@creative-tim.com</p>
-													</div>
-												</div>
-											</td>
-											<td>
-												<p class="text-sm text-dark font-weight-semibold mb-0">Manager</p>
-												<p class="text-sm text-secondary mb-0">Organization</p>
-											</td>
-											<td class="align-middle text-center text-sm"><span
-												class="badge badge-sm border border-success text-success bg-success">Online</span>
-											</td>
-											<td class="align-middle text-center"><span
-												class="text-secondary text-sm font-weight-normal">23/04/18</span>
-											</td>
-											<td class="align-middle"><a href="javascript:;"
-												class="text-secondary font-weight-bold text-xs"
-												data-bs-toggle="tooltip" data-bs-title="Edit user"> <svg
-														width="14" height="14" viewBox="0 0 15 16" fill="none"
-														xmlns="http://www.w3.org/2000/svg">
-                                <path
-															d="M11.2201 2.02495C10.8292 1.63482 10.196 1.63545 9.80585 2.02636C9.41572 2.41727 9.41635 3.05044 9.80726 3.44057L11.2201 2.02495ZM12.5572 6.18502C12.9481 6.57516 13.5813 6.57453 13.9714 6.18362C14.3615 5.79271 14.3609 5.15954 13.97 4.7694L12.5572 6.18502ZM11.6803 1.56839L12.3867 2.2762L12.3867 2.27619L11.6803 1.56839ZM14.4302 4.31284L15.1367 5.02065L15.1367 5.02064L14.4302 4.31284ZM3.72198 15V16C3.98686 16 4.24091 15.8949 4.42839 15.7078L3.72198 15ZM0.999756 15H-0.000244141C-0.000244141 15.5523 0.447471 16 0.999756 16L0.999756 15ZM0.999756 12.2279L0.293346 11.5201C0.105383 11.7077 -0.000244141 11.9624 -0.000244141 12.2279H0.999756ZM9.80726 3.44057L12.5572 6.18502L13.97 4.7694L11.2201 2.02495L9.80726 3.44057ZM12.3867 2.27619C12.7557 1.90794 13.3549 1.90794 13.7238 2.27619L15.1367 0.860593C13.9869 -0.286864 12.1236 -0.286864 10.9739 0.860593L12.3867 2.27619ZM13.7238 2.27619C14.0917 2.64337 14.0917 3.23787 13.7238 3.60504L15.1367 5.02064C16.2875 3.8721 16.2875 2.00913 15.1367 0.860593L13.7238 2.27619ZM13.7238 3.60504L3.01557 14.2922L4.42839 15.7078L15.1367 5.02065L13.7238 3.60504ZM3.72198 14H0.999756V16H3.72198V14ZM1.99976 15V12.2279H-0.000244141V15H1.99976ZM1.70617 12.9357L12.3867 2.2762L10.9739 0.86059L0.293346 11.5201L1.70617 12.9357Z"
-															fill="#64748B" />
-                              </svg>
-											</a></td>
-										</tr>
-										<tr>
-											<td>
-												<div class="d-flex px-2 py-1">
-													<div class="d-flex align-items-center">
-														<img src="assets/img/team-3.jpg"
-															class="avatar avatar-sm rounded-circle me-2" alt="user2">
-													</div>
-													<div class="d-flex flex-column justify-content-center ms-1">
-														<h6 class="mb-0 text-sm font-weight-semibold">Alexa
-															Liras</h6>
-														<p class="text-sm text-secondary mb-0">alexa@creative-tim.com</p>
-													</div>
-												</div>
-											</td>
-											<td>
-												<p class="text-sm text-dark font-weight-semibold mb-0">Programator</p>
-												<p class="text-sm text-secondary mb-0">Developer</p>
-											</td>
-											<td class="align-middle text-center text-sm"><span
-												class="badge badge-sm border border-secondary text-secondary bg-secondary">Offline</span>
-											</td>
-											<td class="align-middle text-center"><span
-												class="text-secondary text-sm font-weight-normal">11/01/19</span>
-											</td>
-											<td class="align-middle"><a href="javascript:;"
-												class="text-secondary font-weight-bold text-xs"
-												data-bs-toggle="tooltip" data-bs-title="Edit user"> <svg
-														width="14" height="14" viewBox="0 0 15 16" fill="none"
-														xmlns="http://www.w3.org/2000/svg">
-                                <path
-															d="M11.2201 2.02495C10.8292 1.63482 10.196 1.63545 9.80585 2.02636C9.41572 2.41727 9.41635 3.05044 9.80726 3.44057L11.2201 2.02495ZM12.5572 6.18502C12.9481 6.57516 13.5813 6.57453 13.9714 6.18362C14.3615 5.79271 14.3609 5.15954 13.97 4.7694L12.5572 6.18502ZM11.6803 1.56839L12.3867 2.2762L12.3867 2.27619L11.6803 1.56839ZM14.4302 4.31284L15.1367 5.02065L15.1367 5.02064L14.4302 4.31284ZM3.72198 15V16C3.98686 16 4.24091 15.8949 4.42839 15.7078L3.72198 15ZM0.999756 15H-0.000244141C-0.000244141 15.5523 0.447471 16 0.999756 16L0.999756 15ZM0.999756 12.2279L0.293346 11.5201C0.105383 11.7077 -0.000244141 11.9624 -0.000244141 12.2279H0.999756ZM9.80726 3.44057L12.5572 6.18502L13.97 4.7694L11.2201 2.02495L9.80726 3.44057ZM12.3867 2.27619C12.7557 1.90794 13.3549 1.90794 13.7238 2.27619L15.1367 0.860593C13.9869 -0.286864 12.1236 -0.286864 10.9739 0.860593L12.3867 2.27619ZM13.7238 2.27619C14.0917 2.64337 14.0917 3.23787 13.7238 3.60504L15.1367 5.02064C16.2875 3.8721 16.2875 2.00913 15.1367 0.860593L13.7238 2.27619ZM13.7238 3.60504L3.01557 14.2922L4.42839 15.7078L15.1367 5.02065L13.7238 3.60504ZM3.72198 14H0.999756V16H3.72198V14ZM1.99976 15V12.2279H-0.000244141V15H1.99976ZM1.70617 12.9357L12.3867 2.2762L10.9739 0.86059L0.293346 11.5201L1.70617 12.9357Z"
-															fill="#64748B" />
-                              </svg>
-											</a></td>
-										</tr>
-										<tr>
-											<td>
-												<div class="d-flex px-2 py-1">
-													<div class="d-flex align-items-center">
-														<img src="assets/img/team-1.jpg"
-															class="avatar avatar-sm rounded-circle me-2" alt="user3">
-													</div>
-													<div class="d-flex flex-column justify-content-center ms-1">
-														<h6 class="mb-0 text-sm font-weight-semibold">Laurent
-															Perrier</h6>
-														<p class="text-sm text-secondary mb-0">laurent@creative-tim.com</p>
-													</div>
-												</div>
-											</td>
-											<td>
-												<p class="text-sm text-dark font-weight-semibold mb-0">Executive</p>
-												<p class="text-sm text-secondary mb-0">Projects</p>
-											</td>
-											<td class="align-middle text-center text-sm"><span
-												class="badge badge-sm border border-success text-success bg-success">Online</span>
-											</td>
-											<td class="align-middle text-center"><span
-												class="text-secondary text-sm font-weight-normal">19/09/17</span>
-											</td>
-											<td class="align-middle"><a href="javascript:;"
-												class="text-secondary font-weight-bold text-xs"
-												data-bs-toggle="tooltip" data-bs-title="Edit user"> <svg
-														width="14" height="14" viewBox="0 0 15 16" fill="none"
-														xmlns="http://www.w3.org/2000/svg">
-                                <path
-															d="M11.2201 2.02495C10.8292 1.63482 10.196 1.63545 9.80585 2.02636C9.41572 2.41727 9.41635 3.05044 9.80726 3.44057L11.2201 2.02495ZM12.5572 6.18502C12.9481 6.57516 13.5813 6.57453 13.9714 6.18362C14.3615 5.79271 14.3609 5.15954 13.97 4.7694L12.5572 6.18502ZM11.6803 1.56839L12.3867 2.2762L12.3867 2.27619L11.6803 1.56839ZM14.4302 4.31284L15.1367 5.02065L15.1367 5.02064L14.4302 4.31284ZM3.72198 15V16C3.98686 16 4.24091 15.8949 4.42839 15.7078L3.72198 15ZM0.999756 15H-0.000244141C-0.000244141 15.5523 0.447471 16 0.999756 16L0.999756 15ZM0.999756 12.2279L0.293346 11.5201C0.105383 11.7077 -0.000244141 11.9624 -0.000244141 12.2279H0.999756ZM9.80726 3.44057L12.5572 6.18502L13.97 4.7694L11.2201 2.02495L9.80726 3.44057ZM12.3867 2.27619C12.7557 1.90794 13.3549 1.90794 13.7238 2.27619L15.1367 0.860593C13.9869 -0.286864 12.1236 -0.286864 10.9739 0.860593L12.3867 2.27619ZM13.7238 2.27619C14.0917 2.64337 14.0917 3.23787 13.7238 3.60504L15.1367 5.02064C16.2875 3.8721 16.2875 2.00913 15.1367 0.860593L13.7238 2.27619ZM13.7238 3.60504L3.01557 14.2922L4.42839 15.7078L15.1367 5.02065L13.7238 3.60504ZM3.72198 14H0.999756V16H3.72198V14ZM1.99976 15V12.2279H-0.000244141V15H1.99976ZM1.70617 12.9357L12.3867 2.2762L10.9739 0.86059L0.293346 11.5201L1.70617 12.9357Z"
-															fill="#64748B" />
-                              </svg>
-											</a></td>
-										</tr>
-										<tr>
-											<td>
-												<div class="d-flex px-2 py-1">
-													<div class="d-flex align-items-center">
-														<img src="assets/img/marie.jpg"
-															class="avatar avatar-sm rounded-circle me-2" alt="user4">
-													</div>
-													<div class="d-flex flex-column justify-content-center ms-1">
-														<h6 class="mb-0 text-sm font-weight-semibold">Michael
-															Levi</h6>
-														<p class="text-sm text-secondary mb-0">michael@creative-tim.com</p>
-													</div>
-												</div>
-											</td>
-											<td>
-												<p class="text-sm text-dark font-weight-semibold mb-0">Programator</p>
-												<p class="text-sm text-secondary mb-0">Developer</p>
-											</td>
-											<td class="align-middle text-center text-sm"><span
-												class="badge badge-sm border border-success text-success bg-success">Online</span>
-											</td>
-											<td class="align-middle text-center"><span
-												class="text-secondary text-sm font-weight-normal">24/12/08</span>
-											</td>
-											<td class="align-middle"><a href="javascript:;"
-												class="text-secondary font-weight-bold text-xs"
-												data-bs-toggle="tooltip" data-bs-title="Edit user"> <svg
-														width="14" height="14" viewBox="0 0 15 16" fill="none"
-														xmlns="http://www.w3.org/2000/svg">
-                                <path
-															d="M11.2201 2.02495C10.8292 1.63482 10.196 1.63545 9.80585 2.02636C9.41572 2.41727 9.41635 3.05044 9.80726 3.44057L11.2201 2.02495ZM12.5572 6.18502C12.9481 6.57516 13.5813 6.57453 13.9714 6.18362C14.3615 5.79271 14.3609 5.15954 13.97 4.7694L12.5572 6.18502ZM11.6803 1.56839L12.3867 2.2762L12.3867 2.27619L11.6803 1.56839ZM14.4302 4.31284L15.1367 5.02065L15.1367 5.02064L14.4302 4.31284ZM3.72198 15V16C3.98686 16 4.24091 15.8949 4.42839 15.7078L3.72198 15ZM0.999756 15H-0.000244141C-0.000244141 15.5523 0.447471 16 0.999756 16L0.999756 15ZM0.999756 12.2279L0.293346 11.5201C0.105383 11.7077 -0.000244141 11.9624 -0.000244141 12.2279H0.999756ZM9.80726 3.44057L12.5572 6.18502L13.97 4.7694L11.2201 2.02495L9.80726 3.44057ZM12.3867 2.27619C12.7557 1.90794 13.3549 1.90794 13.7238 2.27619L15.1367 0.860593C13.9869 -0.286864 12.1236 -0.286864 10.9739 0.860593L12.3867 2.27619ZM13.7238 2.27619C14.0917 2.64337 14.0917 3.23787 13.7238 3.60504L15.1367 5.02064C16.2875 3.8721 16.2875 2.00913 15.1367 0.860593L13.7238 2.27619ZM13.7238 3.60504L3.01557 14.2922L4.42839 15.7078L15.1367 5.02065L13.7238 3.60504ZM3.72198 14H0.999756V16H3.72198V14ZM1.99976 15V12.2279H-0.000244141V15H1.99976ZM1.70617 12.9357L12.3867 2.2762L10.9739 0.86059L0.293346 11.5201L1.70617 12.9357Z"
-															fill="#64748B" />
-                              </svg>
-											</a></td>
-										</tr>
-										<tr>
-											<td>
-												<div class="d-flex px-2 py-1">
-													<div class="d-flex align-items-center">
-														<img src="assets/img/team-5.jpg"
-															class="avatar avatar-sm rounded-circle me-2" alt="user5">
-													</div>
-													<div class="d-flex flex-column justify-content-center ms-1">
-														<h6 class="mb-0 text-sm font-weight-semibold">Richard
-															Gran</h6>
-														<p class="text-sm text-secondary mb-0">richard@creative-tim.com</p>
-													</div>
-												</div>
-											</td>
-											<td>
-												<p class="text-sm text-dark font-weight-semibold mb-0">Manager</p>
-												<p class="text-sm text-secondary mb-0">Executive</p>
-											</td>
-											<td class="align-middle text-center text-sm"><span
-												class="badge badge-sm border border-secondary text-secondary bg-secondary">Offline</span>
-											</td>
-											<td class="align-middle text-center"><span
-												class="text-secondary text-sm font-weight-normal">04/10/21</span>
-											</td>
-											<td class="align-middle"><a href="javascript:;"
-												class="text-secondary font-weight-bold text-xs"
-												data-bs-toggle="tooltip" data-bs-title="Edit user"> <svg
-														width="14" height="14" viewBox="0 0 15 16" fill="none"
-														xmlns="http://www.w3.org/2000/svg">
-                                <path
-															d="M11.2201 2.02495C10.8292 1.63482 10.196 1.63545 9.80585 2.02636C9.41572 2.41727 9.41635 3.05044 9.80726 3.44057L11.2201 2.02495ZM12.5572 6.18502C12.9481 6.57516 13.5813 6.57453 13.9714 6.18362C14.3615 5.79271 14.3609 5.15954 13.97 4.7694L12.5572 6.18502ZM11.6803 1.56839L12.3867 2.2762L12.3867 2.27619L11.6803 1.56839ZM14.4302 4.31284L15.1367 5.02065L15.1367 5.02064L14.4302 4.31284ZM3.72198 15V16C3.98686 16 4.24091 15.8949 4.42839 15.7078L3.72198 15ZM0.999756 15H-0.000244141C-0.000244141 15.5523 0.447471 16 0.999756 16L0.999756 15ZM0.999756 12.2279L0.293346 11.5201C0.105383 11.7077 -0.000244141 11.9624 -0.000244141 12.2279H0.999756ZM9.80726 3.44057L12.5572 6.18502L13.97 4.7694L11.2201 2.02495L9.80726 3.44057ZM12.3867 2.27619C12.7557 1.90794 13.3549 1.90794 13.7238 2.27619L15.1367 0.860593C13.9869 -0.286864 12.1236 -0.286864 10.9739 0.860593L12.3867 2.27619ZM13.7238 2.27619C14.0917 2.64337 14.0917 3.23787 13.7238 3.60504L15.1367 5.02064C16.2875 3.8721 16.2875 2.00913 15.1367 0.860593L13.7238 2.27619ZM13.7238 3.60504L3.01557 14.2922L4.42839 15.7078L15.1367 5.02065L13.7238 3.60504ZM3.72198 14H0.999756V16H3.72198V14ZM1.99976 15V12.2279H-0.000244141V15H1.99976ZM1.70617 12.9357L12.3867 2.2762L10.9739 0.86059L0.293346 11.5201L1.70617 12.9357Z"
-															fill="#64748B" />
-                              </svg>
-											</a></td>
-										</tr>
-										<tr>
-											<td>
-												<div class="d-flex px-2 py-1">
-													<div class="d-flex align-items-center">
-														<img src="assets/img/team-6.jpg"
-															class="avatar avatar-sm rounded-circle me-2" alt="user6">
-													</div>
-													<div class="d-flex flex-column justify-content-center ms-1">
-														<h6 class="mb-0 text-sm font-weight-semibold">Miriam
-															Eric</h6>
-														<p class="text-sm text-secondary mb-0">miriam@creative-tim.com</p>
-													</div>
-												</div>
-											</td>
-											<td>
-												<p class="text-sm text-dark font-weight-semibold mb-0">Programtor</p>
-												<p class="text-sm text-secondary mb-0">Developer</p>
-											</td>
-											<td class="align-middle text-center text-sm"><span
-												class="badge badge-sm border border-secondary text-secondary bg-secondary">Offline</span>
-											</td>
-											<td class="align-middle text-center"><span
-												class="text-secondary text-sm font-weight-normal">14/09/20</span>
-											</td>
-											<td class="align-middle"><a href="javascript:;"
-												class="text-secondary font-weight-bold text-xs"
-												data-bs-toggle="tooltip" data-bs-title="Edit user"> <svg
-														width="14" height="14" viewBox="0 0 15 16" fill="none"
-														xmlns="http://www.w3.org/2000/svg">
-                                <path
-															d="M11.2201 2.02495C10.8292 1.63482 10.196 1.63545 9.80585 2.02636C9.41572 2.41727 9.41635 3.05044 9.80726 3.44057L11.2201 2.02495ZM12.5572 6.18502C12.9481 6.57516 13.5813 6.57453 13.9714 6.18362C14.3615 5.79271 14.3609 5.15954 13.97 4.7694L12.5572 6.18502ZM11.6803 1.56839L12.3867 2.2762L12.3867 2.27619L11.6803 1.56839ZM14.4302 4.31284L15.1367 5.02065L15.1367 5.02064L14.4302 4.31284ZM3.72198 15V16C3.98686 16 4.24091 15.8949 4.42839 15.7078L3.72198 15ZM0.999756 15H-0.000244141C-0.000244141 15.5523 0.447471 16 0.999756 16L0.999756 15ZM0.999756 12.2279L0.293346 11.5201C0.105383 11.7077 -0.000244141 11.9624 -0.000244141 12.2279H0.999756ZM9.80726 3.44057L12.5572 6.18502L13.97 4.7694L11.2201 2.02495L9.80726 3.44057ZM12.3867 2.27619C12.7557 1.90794 13.3549 1.90794 13.7238 2.27619L15.1367 0.860593C13.9869 -0.286864 12.1236 -0.286864 10.9739 0.860593L12.3867 2.27619ZM13.7238 2.27619C14.0917 2.64337 14.0917 3.23787 13.7238 3.60504L15.1367 5.02064C16.2875 3.8721 16.2875 2.00913 15.1367 0.860593L13.7238 2.27619ZM13.7238 3.60504L3.01557 14.2922L4.42839 15.7078L15.1367 5.02065L13.7238 3.60504ZM3.72198 14H0.999756V16H3.72198V14ZM1.99976 15V12.2279H-0.000244141V15H1.99976ZM1.70617 12.9357L12.3867 2.2762L10.9739 0.86059L0.293346 11.5201L1.70617 12.9357Z"
-															fill="#64748B" />
-                              </svg>
-											</a></td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-							<div class="border-top py-3 px-3 d-flex align-items-center">
-								<p class="font-weight-semibold mb-0 text-dark text-sm">Page
-									1 of 10</p>
-								<div class="ms-auto">
-									<button class="btn btn-sm btn-white mb-0">Previous</button>
-									<button class="btn btn-sm btn-white mb-0">Next</button>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
 			</div>
+		</div>
 		</div>
 
 		<footer class="footer pt-3  ">
@@ -751,267 +631,34 @@
 			</div>
 		</div>
 	</div>
+
+<!-- Button trigger modal -->
+
+<div class="modal fade" id="modalMsg" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Erro</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 	<!--   Core JS Files   -->
 	<jsp:include page="fragmentos/scripts.jsp"></jsp:include>
 
-	<script>
-	$("#nome").focus();
-
-    $(function() {
-        $('#salario').maskMoney({
-			prefix:'R$ ',
-			thousands: '.',
-			decimal: ','
-         });
-      })
-    
-    if (document.getElementsByClassName('mySwiper')) {
-      var swiper = new Swiper(".mySwiper", {
-        effect: "cards",
-        grabCursor: true,
-        initialSlide: 1,
-        navigation: {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
-        },
-      });
-    };
-
-    var ctx = document.getElementById("chart-bars").getContext("2d");
-
-    new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-        datasets: [{
-            label: "Sales",
-            tension: 0.4,
-            borderWidth: 0,
-            borderSkipped: false,
-            backgroundColor: "#2ca8ff",
-            data: [450, 200, 100, 220, 500, 100, 400, 230, 500, 200],
-            maxBarThickness: 6
-          },
-          {
-            label: "Sales",
-            tension: 0.4,
-            borderWidth: 0,
-            borderSkipped: false,
-            backgroundColor: "#7c3aed",
-            data: [200, 300, 200, 420, 400, 200, 300, 430, 400, 300],
-            maxBarThickness: 6
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          tooltip: {
-            backgroundColor: '#fff',
-            titleColor: '#1e293b',
-            bodyColor: '#1e293b',
-            borderColor: '#e9ecef',
-            borderWidth: 1,
-            usePointStyle: true
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            stacked: true,
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [4, 4],
-            },
-            ticks: {
-              beginAtZero: true,
-              padding: 10,
-              font: {
-                size: 12,
-                family: "Noto Sans",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#64748B"
-            },
-          },
-          x: {
-            stacked: true,
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false
-            },
-            ticks: {
-              font: {
-                size: 12,
-                family: "Noto Sans",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#64748B"
-            },
-          },
-        },
-      },
-    });
+	<script src="<%=contexto%>assets/js/script-funcionario.js"></script>
 
 
-    var ctx2 = document.getElementById("chart-line").getContext("2d");
 
-    var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke1.addColorStop(1, 'rgba(45,168,255,0.2)');
-    gradientStroke1.addColorStop(0.2, 'rgba(45,168,255,0.0)');
-    gradientStroke1.addColorStop(0, 'rgba(45,168,255,0)'); //blue colors
-
-    var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke2.addColorStop(1, 'rgba(119,77,211,0.4)');
-    gradientStroke2.addColorStop(0.7, 'rgba(119,77,211,0.1)');
-    gradientStroke2.addColorStop(0, 'rgba(119,77,211,0)'); //purple colors
-
-    new Chart(ctx2, {
-      plugins: [{
-        beforeInit(chart) {
-          const originalFit = chart.legend.fit;
-          chart.legend.fit = function fit() {
-            originalFit.bind(chart.legend)();
-            this.height += 40;
-          }
-        },
-      }],
-      type: "line",
-      data: {
-        labels: ["Aug 18", "Aug 19", "Aug 20", "Aug 21", "Aug 22", "Aug 23", "Aug 24", "Aug 25", "Aug 26", "Aug 27", "Aug 28", "Aug 29", "Aug 30", "Aug 31", "Sept 01", "Sept 02", "Sept 03", "Aug 22", "Sept 04", "Sept 05", "Sept 06", "Sept 07", "Sept 08", "Sept 09"],
-        datasets: [{
-            label: "Volume",
-            tension: 0,
-            borderWidth: 2,
-            pointRadius: 3,
-            borderColor: "#2ca8ff",
-            pointBorderColor: '#2ca8ff',
-            pointBackgroundColor: '#2ca8ff',
-            backgroundColor: gradientStroke1,
-            fill: true,
-            data: [2828, 1291, 3360, 3223, 1630, 980, 2059, 3092, 1831, 1842, 1902, 1478, 1123, 2444, 2636, 2593, 2885, 1764, 898, 1356, 2573, 3382, 2858, 4228],
-            maxBarThickness: 6
-
-          },
-          {
-            label: "Trade",
-            tension: 0,
-            borderWidth: 2,
-            pointRadius: 3,
-            borderColor: "#832bf9",
-            pointBorderColor: '#832bf9',
-            pointBackgroundColor: '#832bf9',
-            backgroundColor: gradientStroke2,
-            fill: true,
-            data: [2797, 2182, 1069, 2098, 3309, 3881, 2059, 3239, 6215, 2185, 2115, 5430, 4648, 2444, 2161, 3018, 1153, 1068, 2192, 1152, 2129, 1396, 2067, 1215, 712, 2462, 1669, 2360, 2787, 861],
-            maxBarThickness: 6
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-            align: 'end',
-            labels: {
-              boxWidth: 6,
-              boxHeight: 6,
-              padding: 20,
-              pointStyle: 'circle',
-              borderRadius: 50,
-              usePointStyle: true,
-              font: {
-                weight: 400,
-              },
-            },
-          },
-          tooltip: {
-            backgroundColor: '#fff',
-            titleColor: '#1e293b',
-            bodyColor: '#1e293b',
-            borderColor: '#e9ecef',
-            borderWidth: 1,
-            pointRadius: 2,
-            usePointStyle: true,
-            boxWidth: 8,
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [4, 4]
-            },
-            ticks: {
-              callback: function(value, index, ticks) {
-                return parseInt(value).toLocaleString() + ' EUR';
-              },
-              display: true,
-              padding: 10,
-              color: '#b2b9bf',
-              font: {
-                size: 12,
-                family: "Noto Sans",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#64748B"
-            }
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [4, 4]
-            },
-            ticks: {
-              display: true,
-              color: '#b2b9bf',
-              padding: 20,
-              font: {
-                size: 12,
-                family: "Noto Sans",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#64748B"
-            }
-          },
-        },
-      },
-    });
-  </script>
-	<script>
-
-
+	<%-- <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
       var options = {
@@ -1019,7 +666,7 @@
       }
       Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
-  </script>
+  </script> --%>
 </body>
 
 </html>
