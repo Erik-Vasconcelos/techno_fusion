@@ -22,6 +22,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
+import br.com.jdevtreinamentos.tf.controller.infra.OperacaoErro;
 import br.com.jdevtreinamentos.tf.controller.infra.ResponseEntity;
 import br.com.jdevtreinamentos.tf.controller.infra.StatusResposta;
 import br.com.jdevtreinamentos.tf.exception.DadosInvalidosException;
@@ -48,6 +49,7 @@ public class FuncionarioController extends HttpServlet {
 	private static final Double SALARIO_MAXIMO = 100000.0;
 	private static final Integer QTD_MIN_CARACTERES_LOGIN = 5;
 	private static final Integer QTD_MAX_CARACTERES_LOGIN = 8;
+	private static final Integer PAGINA_INICIAL = 1;
 
 	private DAOFuncionario daoFuncionario;
 
@@ -57,30 +59,58 @@ public class FuncionarioController extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		// TODO - realizar o tratamento de pagina nao existente
 
-		if (request.getServletPath().endsWith("editar")) {
-			String idString = request.getParameter("id");
+		try {
+			String pageString = request.getParameter("page");
 
-			if (idString != null && !idString.trim().isEmpty()) {
-				Long id = Long.parseLong(idString);
+			if (request.getServletPath().endsWith("editar")) {
+				String idString = request.getParameter("id");
 
-				Optional<Funcionario> optional = daoFuncionario.buscarPorId(id);
+				if (idString != null && !idString.trim().isEmpty()) {
+					Long id = Long.parseLong(idString);
 
-				if (optional.isPresent()) {
-					ObjectMapper mapper = JsonMapper.builder().findAndAddModules().build();
+					Optional<Funcionario> optional = daoFuncionario.buscarPorId(id);
 
-					String json = mapper.writeValueAsString(optional.get());
+					if (optional.isPresent()) {
+						ObjectMapper mapper = JsonMapper.builder().findAndAddModules().build();
 
-					response.getWriter().write(json);
-					response.setContentType("application/json");
+						String json = mapper.writeValueAsString(optional.get());
+
+						response.getWriter().write(json);
+						response.setContentType("application/json");
+					} else {
+						response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+						response.getWriter().write("Erro: não foi possível encontrar o funcionário #" + id);
+						response.setContentType("text/plain");
+					}
+				}
+
+			} else {
+				if (pageString != null && !pageString.trim().isEmpty()) {
+					int pagina = Integer.parseInt(pageString);
+
+					int totalPaginas = daoFuncionario.obterTotalPaginas(daoFuncionario.obterTotalRegistros());
+
+					boolean paginaValida = pagina > 0 && pagina <= totalPaginas;
+
+					if (paginaValida) {
+						encaminharParaPaginaFuncionarios(request, response, pagina);
+
+					} else {
+						throw new IllegalArgumentException("A página #" + pagina + " não existe!");
+					}
+
 				} else {
-					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-					response.getWriter().write("Erro: não foi possível encontrar o funcionário #" + id);
-					response.setContentType("text/plain");
+					encaminharParaPaginaFuncionarios(request, response);
 				}
 			}
 
-		} else {
+		} catch (Exception e) {
+			ResponseEntity<Funcionario> resposta = gerarReposta(Funcionario.class, StatusResposta.ERROR, null,
+					"Erro no processamento: " + e.getMessage());
+			request.setAttribute("resposta", resposta);
+
 			encaminharParaPaginaFuncionarios(request, response);
 		}
 
@@ -154,17 +184,22 @@ public class FuncionarioController extends HttpServlet {
 			ResponseEntity<Funcionario> resposta = gerarReposta(Funcionario.class, StatusResposta.ERROR, funcionario,
 					"Erro no processamento: " + e.getMessage());
 			request.setAttribute("resposta", resposta);
-
+			request.setAttribute("operacaoErro", OperacaoErro.SAVE);
+			
 			encaminharParaPaginaFuncionarios(request, response);
 		}
 	}
 
 	private void encaminharParaPaginaFuncionarios(HttpServletRequest request, HttpServletResponse response) {
+		encaminharParaPaginaFuncionarios(request, response, PAGINA_INICIAL);
+	}
+
+	private void encaminharParaPaginaFuncionarios(HttpServletRequest request, HttpServletResponse response, int page) {
 		try {
 			RequestDispatcher encaminhador = request.getRequestDispatcher("/view/admin/funcionarios.jsp");
 			request.setAttribute("tipoSexo", EnumSexo.values());
 			request.setAttribute("perfilFuncionario", PerfilFuncionario.values());
-			request.setAttribute("listaFuncionarios", daoFuncionario.obterListPreview());
+			request.setAttribute("pagination", daoFuncionario.obterRegistrosPaginadosPreview(page));
 
 			encaminhador.forward(request, response);
 		} catch (ServletException | IOException e) {

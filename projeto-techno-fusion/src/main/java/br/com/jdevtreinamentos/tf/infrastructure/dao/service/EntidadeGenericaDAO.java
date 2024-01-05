@@ -3,6 +3,8 @@ package br.com.jdevtreinamentos.tf.infrastructure.dao.service;
 import java.util.List;
 import java.util.Optional;
 
+import br.com.jdevtreinamentos.tf.util.Pagination;
+
 /**
  * Interface que definie as operações que as classes de DAO devem implementar e
  * disponibilizar que serem utilizadas.
@@ -20,7 +22,7 @@ public interface EntidadeGenericaDAO<T>{
 	
 	public List<T> obterTodos();
 	
-	public List<T> obterRegistrosPaginados(Integer pagina);
+	public Pagination<T> obterRegistrosPaginadosPreview(Integer numeroPagina);
 
 	public boolean excluirPorId(Long id);
 	

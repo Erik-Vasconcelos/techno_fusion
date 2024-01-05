@@ -15,6 +15,8 @@ import br.com.jdevtreinamentos.tf.infrastructure.dao.service.EntidadeGenericaDAO
 import br.com.jdevtreinamentos.tf.model.Funcionario;
 import br.com.jdevtreinamentos.tf.model.enumeration.EnumSexo;
 import br.com.jdevtreinamentos.tf.model.enumeration.PerfilFuncionario;
+import br.com.jdevtreinamentos.tf.util.Pageable;
+import br.com.jdevtreinamentos.tf.util.Pagination;
 
 /**
  * Classe que implementa o padrão de projeto Data Acess Object - DAO que separa
@@ -29,6 +31,7 @@ import br.com.jdevtreinamentos.tf.model.enumeration.PerfilFuncionario;
 public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcionario> {
 
 	private static final long serialVersionUID = 1L;
+	private static final int REGISTROS_POR_PAGINA = 10;
 
 	private Connection conexao;
 	private PreparedStatement stmt;
@@ -91,7 +94,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 				if (entidade.getImagem() != null && !entidade.getImagem().trim().isEmpty()) {
 					salvarImagem(entidade);
 				}
-				
+
 				optional = buscarPorId(entidade.getId());
 			}
 
@@ -160,7 +163,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 	public List<Funcionario> obterTodos() {
 		List<Funcionario> funcionarios = new ArrayList<>();
 		try {
-			String sql = "SELECT f.id, f.nome, f.sexo, f.data_nascimento, f.email, f.perfil, f.salario, f.imagem, f.login FROM funcionario f";
+			String sql = "SELECT f.id, f.nome, f.sexo, f.data_nascimento, f.email, f.perfil, f.salario, f.imagem, f.login FROM funcionario f ORDER BY id DESC";
 			stmt = conexao.prepareStatement(sql);
 
 			ResultSet resultado = stmt.executeQuery();
@@ -192,7 +195,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 	public List<Funcionario> obterListPreview() {
 		List<Funcionario> funcionarios = new ArrayList<>();
 		try {
-			String sql = "SELECT f.id, f.nome, f.sexo, f.email, f.perfil, f.salario FROM funcionario f limit 10";
+			String sql = "SELECT f.id, f.nome, f.sexo, f.email, f.perfil, f.salario FROM funcionario f ORDER BY id DESC";
 			stmt = conexao.prepareStatement(sql);
 
 			ResultSet resultado = stmt.executeQuery();
@@ -219,8 +222,47 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 	}
 
 	@Override
-	public List<Funcionario> obterRegistrosPaginados(Integer pagina) {
-		return null;
+	public Pagination<Funcionario> obterRegistrosPaginadosPreview(Integer numeroPagina) {
+		Pagination<Funcionario> pagination = new Pagination<>();
+
+		try {
+			int offset = (numeroPagina - 1) * REGISTROS_POR_PAGINA;
+
+			String sql = "SELECT f.id, f.nome, f.sexo, f.email, f.perfil, f.salario FROM funcionario f ORDER BY id DESC LIMIT ? OFFSET ?";
+			stmt = conexao.prepareStatement(sql);
+			stmt.setInt(1, REGISTROS_POR_PAGINA);
+			stmt.setInt(2, offset);
+
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
+
+			List<Funcionario> funcionarios = new ArrayList<>();
+			while (resultado.next()) {
+				Funcionario funcionario = new Funcionario();
+				funcionario.setId(resultado.getLong("id"));
+				funcionario.setNome(resultado.getString("nome"));
+				funcionario.setSexo(EnumSexo.toEnumBySigla(resultado.getString("sexo")));
+				funcionario.setEmail(resultado.getString("email"));
+				funcionario.setSalario(resultado.getDouble("salario"));
+				funcionario.setPerfil(PerfilFuncionario.toEnum(resultado.getString("perfil")));
+
+				funcionarios.add(funcionario);
+			}
+			
+			int qtdRegistros = obterTotalRegistros();
+			int totalPaginas = obterTotalPaginas(qtdRegistros);
+			
+			pagination.setContent(funcionarios);
+			pagination.setTotalPages(totalPaginas);
+			pagination.setTotalElements(qtdRegistros);
+			pagination.setPageable(new Pageable(offset, REGISTROS_POR_PAGINA, numeroPagina));
+
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
+
+		return pagination;
 	}
 
 	@Override
@@ -239,6 +281,35 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 		}
 
 		return false;
+	}
+
+	public int obterTotalRegistros() {
+		int totalFuncionarios = 0;
+
+		try {
+			String sql = "SELECT COUNT(*) FROM funcionario";
+			stmt = conexao.prepareStatement(sql);
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				totalFuncionarios = rs.getInt(1);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return totalFuncionarios;
+	}
+
+	public int obterTotalPaginas(int qtdRegistros) {
+		int total = qtdRegistros / REGISTROS_POR_PAGINA;
+
+		if (qtdRegistros % REGISTROS_POR_PAGINA > 0) {
+			total++;
+		}
+
+		return total;
 	}
 
 	public boolean loginExiste(String login) {
@@ -262,7 +333,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 
 		return false;
 	}
-	
+
 	public boolean loginExisteUpdate(Long id, String login) {
 		try {
 			String sql = "SELECT COUNT(id) > 0 AS loginUpdateExiste FROM funcionario WHERE login = ? AND id != ?";

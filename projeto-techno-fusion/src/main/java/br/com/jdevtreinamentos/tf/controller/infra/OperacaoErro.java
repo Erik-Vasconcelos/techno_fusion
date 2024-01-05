@@ -3,17 +3,17 @@ package br.com.jdevtreinamentos.tf.controller.infra;
 import lombok.AllArgsConstructor;
 
 /**
- * Enum do <strong>status da reposta<strong> das operações.
+ * Enum da <strong>operação<strong> que deu erro.
  * 
  * @author Erik Vasconcelos
- * @since 2023-12-28
- * @version 0.1 2023-12-28
+ * @since 2024-01-05
+ * @version 0.1 2024-01-05
  */
 
 @AllArgsConstructor
-public enum StatusResposta {
+public enum OperacaoErro {
 
-	SUCCESS(1, "SUCESSO"), INFORMATION(2, "INFORMACAO"), ERROR(3, "ERRO");
+	SAVE(1, "Salvar"), OTHER(2, "Outro");
 
 	private Integer codigo;
 	private String descricao;
@@ -34,13 +34,13 @@ public enum StatusResposta {
 		this.descricao = descricao;
 	}
 
-	public static StatusResposta toEnum(Integer codigo) {
+	public static OperacaoErro toEnum(Integer codigo) {
 		if (codigo == null)
 			return null;
 
-		for (StatusResposta s : StatusResposta.values()) {
-			if (codigo.equals(s.getCodigo())) {
-				return s;
+		for (OperacaoErro o : OperacaoErro.values()) {
+			if (codigo.equals(o.getCodigo())) {
+				return o;
 			}
 		}
 

@@ -12,14 +12,14 @@ triggerTabList.forEach(triggerEl => {
 
 //Verifica se houve algum erro, em caso afirmativo muda para a tela de cadastro/atualização 
 document.addEventListener('DOMContentLoaded', function () {
-	var cod = $('#cod-msg').val();
+	var operacaoErro = $('#operacaoErro').val();
 	var id = $('#id').val();
 
-	if (id != '') {
+	if (operacaoErro == 'SAVE' && id != '') {
 		configTabAtualizar();
 	}
 
-	if (cod == 3) {
+	if (operacaoErro == 'SAVE') {
 		setTabEdicao();
 	}
 
@@ -54,13 +54,26 @@ function previewImage() {
 	if (fileInput.files.length > 0) {
 		var file = fileInput.files[0];
 
-		var reader = new FileReader();
+		var tamanhoArquivo = file.size; // Tamanho em bytes
+		var tamanhoMaximo = 3 * 1024 * 1024; // 3 MB em bytes
 
-		reader.onload = function (e) {
-			imagePreview.src = e.target.result;
-		};
+		if (tamanhoArquivo > tamanhoMaximo) {
+			$("#modalBody").text("O tamanho da imagem deve ser no máximo de 3 MB");
+			$("#modalMsg").modal("show");
 
-		reader.readAsDataURL(file);
+			fileInput.value = ''; // Limpar o input para evitar o upload do arquivo grande
+		} else {
+			var reader = new FileReader();
+
+			reader.onload = function (e) {
+				imagePreview.src = e.target.result;
+			};
+
+			reader.readAsDataURL(file);
+		}
+
+
+
 	} else {
 		imagePreview.src = '/projeto-techno-fusion/view/admin/assets/img/usuario.png';
 	}
@@ -163,6 +176,8 @@ function restaurarTab() {
 
 	$('#box-img').attr('src', '/projeto-techno-fusion/view/admin/assets/img/usuario.png');
 	$('#groupSenha').css("display", "block");
+	$('#input-imagem').val("");
+	
 }
 
 function showPreloader() {

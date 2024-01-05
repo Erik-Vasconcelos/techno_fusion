@@ -5525,8 +5525,8 @@ fieldset:disabled .btn {
   --bs-pagination-border-width: 1px;
   --bs-pagination-border-color: #dde0e5;
   --bs-pagination-border-radius: 0.25rem;
-  --bs-pagination-hover-color: #522aaa;
-  --bs-pagination-hover-bg: #e9ecef;
+  --bs-pagination-hover-color: #64748b;
+  --bs-pagination-hover-bg: rgba(209, 0, 36, 0.5);
   --bs-pagination-hover-border-color: #dde0e5;
   --bs-pagination-focus-color: #522aaa;
   --bs-pagination-focus-bg: #e9ecef;
@@ -23842,6 +23842,7 @@ hr.horizontal.gray-light {
 
 .page-item.active .page-link {
   border: 1px solid #cbd5e1;
+  color: #FFF;
 }
 
 .page-item .page-link,
@@ -23936,11 +23937,10 @@ hr.horizontal.gray-light {
   border: 1px solid #1e293b;
 }
 
-.pagination.pagination-white .page-item.active>.page-link,
-.pagination.pagination-white .page-item.active>.page-link:focus,
-.pagination.pagination-white .page-item.active>.page-link:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid #fff;
+.page-item>.page-link:hover,
+.page-item.active>.page-link:hover {
+  background: rgba(209, 0, 36, 0.7);
+  color: #222222;
 }
 
 .popover {
@@ -27575,6 +27575,16 @@ button.swiper-pagination-bullet {
 .swiper-button-prev:after {
   font-size: 1rem;
   color: #15161D;
+}
+
+.disable-link {
+  background-color: #f1f1f1;
+  color: #c1c1c1;
+}
+
+.disable-link:hover {
+  background-color: #f1f1f1;
+  color: #c1c1c1;
 }
 
 /*# sourceMappingURL=dashboard-free.css.map */

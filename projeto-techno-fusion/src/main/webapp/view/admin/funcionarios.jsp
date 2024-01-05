@@ -23,21 +23,21 @@ String contexto = request.getContextPath() + "/view/admin/";
 		<!-- Navbar -->
 
 		<c:if test="${not empty resposta.mensagem}">
-			<c:if test="${resposta.status.codigo == 1}">
+			<c:if test="${resposta.status eq 'SUCCESS'}">
 				<div class="alert alert-success" id="box-msg">${resposta.mensagem}</div>
 			</c:if>
 
-			<c:if test="${resposta.status.codigo == 2}">
+			<c:if test="${resposta.status eq 'INFORMATION'}">
 				<div class="alert alert-warning" id="box-msg">${resposta.mensagem}</div>
 			</c:if>
 
-			<c:if test="${resposta.status.codigo == 3}">
+			<c:if test="${resposta.status eq 'ERROR'}">
 				<div class="alert alert-danger" id="box-msg">${resposta.mensagem}</div>
 			</c:if>
 		</c:if>
 
 		<div class="preloader-container" id="preloader">
-    		<div class="loader"></div>
+			<div class="loader"></div>
 		</div>
 
 		<nav
@@ -278,7 +278,7 @@ String contexto = request.getContextPath() + "/view/admin/";
 											</tr>
 										</thead>
 										<tbody>
-											<c:forEach items="${listaFuncionarios}" var="f">
+											<c:forEach items="${pagination.content}" var="f">
 												<tr>
 													<td>
 														<div class="d-flex px-2 py-1">
@@ -299,7 +299,8 @@ String contexto = request.getContextPath() + "/view/admin/";
 													<td class="align-middle text-center"><span
 														class="badge badge-sm border border-success text-sm font-weight-semibold mb-0 text-success bg-success">R$
 															${f.salario}</span></td>
-													<td class="align-middle"><a onclick="editar(this)" id="${f.id}"
+													<td class="align-middle"><a onclick="editar(this)"
+														id="${f.id}"
 														class="text-secondary font-weight-bold text-xs"
 														data-bs-toggle="tooltip"
 														data-bs-title="Editar funcionario"> <svg width="20"
@@ -317,11 +318,57 @@ String contexto = request.getContextPath() + "/view/admin/";
 									</table>
 								</div>
 								<div class="border-top py-3 px-3 d-flex align-items-center">
-									<p class="font-weight-semibold mb-0 text-dark text-sm">Page
-										1 of 10</p>
+									<p class="font-weight-semibold mb-0 text-dark text-sm">Página
+										${pagination.pageable.pageNumber} de ${pagination.totalPages}</p>
 									<div class="ms-auto">
-										<button class="btn btn-sm btn-white mb-0">Previous</button>
-										<button class="btn btn-sm btn-white mb-0">Next</button>
+										<nav>
+											<ul class="pagination justify-content-end">
+												<c:choose>
+													<c:when test="${pagination.pageable.pageNumber > 1}">
+														<li class="page-item"><a
+															href="<%=request.getContextPath() + "/funcionario?page="%>${pagination.pageable.pageNumber - 1}"
+															class="btn btn-white mb-0">Anterior</a></li>
+													</c:when>
+
+													<c:otherwise>
+														<li class="page-item"><a
+															class="btn btn-white mb-0 disable-link">Anterior</a></li>
+													</c:otherwise>
+												</c:choose>
+
+												<c:forEach var="i" begin="1" end="${pagination.totalPages}"
+													step="1">
+													<c:choose>
+														<c:when test="${i eq pagination.pageable.pageNumber}">
+															<li class="page-item active"><a
+																class="btn btn-white mb-0 page-link">${i}</a>
+															</li>
+														</c:when>
+														<c:otherwise>
+															<li class="page-item"><a
+																class="btn btn-white mb-0 page-link"
+																href="<%=request.getContextPath() + "/funcionario?page="%>${i}">${i}</a>
+															</li>
+														</c:otherwise>
+													</c:choose>
+
+												</c:forEach>
+
+												<c:choose>
+													<c:when
+														test="${pagination.pageable.pageNumber < pagination.totalPages}">
+														<li class="page-item"><a class="btn btn-white mb-0"
+															href="<%=request.getContextPath() + "/funcionario?page="%>${pagination.pageable.pageNumber + 1}">Próximo</a></li>
+													</c:when>
+
+													<c:otherwise>
+														<li class="page-item"><a
+															class="btn btn-white mb-0 disable-link">Próximo</a></li>
+													</c:otherwise>
+												</c:choose>
+											</ul>
+										</nav>
+
 									</div>
 								</div>
 							</div>
@@ -347,8 +394,10 @@ String contexto = request.getContextPath() + "/view/admin/";
 									action="<%=request.getContextPath() + "/funcionario"%>"
 									method="post" id="formFuncionario">
 
-									<input type="hidden" value="${resposta.status.codigo}" id="cod-msg">
-									<input type="hidden" value="${resposta.artefato.imagem}" id="imagemArmazenada" name="imagemArmazenada">
+									<input type="hidden" value="${operacaoErro}"
+										id="operacaoErro"> <input type="hidden"
+										value="${resposta.artefato.imagem}" id="imagemArmazenada"
+										name="imagemArmazenada">
 
 									<div class="form-group">
 										<label for="id" class="form-control-label">Id</label> <input
@@ -364,8 +413,9 @@ String contexto = request.getContextPath() + "/view/admin/";
 									<div class="form-group">
 										<c:choose>
 											<c:when test="${not empty resposta.artefato.imagem}">
-												<img src="" class="rounded"
-													alt="Imagem funcionário" style="width: 200px; height: 200px; object-fit: cover;" id="box-img">
+												<img src="" class="rounded" alt="Imagem funcionário"
+													style="width: 200px; height: 200px; object-fit: cover;"
+													id="box-img">
 											</c:when>
 
 											<c:otherwise>
@@ -379,7 +429,7 @@ String contexto = request.getContextPath() + "/view/admin/";
 									<div class="form-group">
 										<label for="imagem" class="form-control-label">Imagem</label>
 										<input class="form-control" type="file" accept="image/*"
-											value="${resposta.artefato.imagem}" id="input-imagem"
+											value="${resposta.artefato.imagem}" id="input-imagem" 
 											name="imagem" onchange="previewImage()">
 									</div>
 
@@ -393,7 +443,8 @@ String contexto = request.getContextPath() + "/view/admin/";
 												<c:when test="${empty resposta.artefato.sexo}">
 													<input class="form-check-input" type="radio"
 														value="${s.name()}" required="required" name="sexo"
-														id="radioSexo<%=count%>" <%if(count == 1){ out.print("checked"); count ++;}%>>
+														id="radioSexo<%=count%>"
+														<%if(count == 1){ out.print("checked"); count ++;}%>>
 													<label class="custom-control-label"
 														for="radioSexo<%=count++%>">${s.descricao}</label>
 													<br>
@@ -490,7 +541,7 @@ String contexto = request.getContextPath() + "/view/admin/";
 											<%-- <input type="submit" class="btn btn-success me-2"
 												value="Salvar"> --%>
 											<button type="button" class="btn btn-success me-2"
-                                                onclick="enviarForm()">Salvar</button>
+												onclick="enviarForm()">Salvar</button>
 
 											<button type="button" class="btn btn-info me-2"
 												onclick="restaurarTab()">Novo funcionário</button>
@@ -517,8 +568,8 @@ String contexto = request.getContextPath() + "/view/admin/";
 							class="copyright text-center text-xs text-muted text-lg-start">
 							Copyright ©
 							<script>
-                  document.write(new Date().getFullYear())
-                </script>
+								document.write(new Date().getFullYear())
+							</script>
 							Corporate UI by <a href="https://www.creative-tim.com"
 								class="text-secondary" target="_blank">Creative Tim</a>.
 						</div>
@@ -632,24 +683,26 @@ String contexto = request.getContextPath() + "/view/admin/";
 		</div>
 	</div>
 
-<!-- Button trigger modal -->
+	<!-- Button trigger modal -->
 
-<div class="modal fade" id="modalMsg" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="staticBackdropLabel">Erro</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="modalBody">
-        
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-      </div>
-    </div>
-  </div>
-</div>
+	<div class="modal fade" id="modalMsg" data-bs-backdrop="static"
+		data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="staticBackdropLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="staticBackdropLabel">Erro</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body" id="modalBody"></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">Fechar</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<!--   Core JS Files   -->
 	<jsp:include page="fragmentos/scripts.jsp"></jsp:include>
