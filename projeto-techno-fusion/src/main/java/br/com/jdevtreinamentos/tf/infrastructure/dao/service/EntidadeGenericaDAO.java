@@ -22,7 +22,7 @@ public interface EntidadeGenericaDAO<T>{
 	
 	public List<T> obterTodos();
 	
-	public Pagination<T> obterRegistrosPaginadosPreview(Integer numeroPagina);
+	public Pagination<T> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina);
 
 	public boolean excluirPorId(Long id);
 	

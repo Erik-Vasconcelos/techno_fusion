@@ -83,6 +83,9 @@ function previewImage() {
 function enviarForm() {
 	$('#formFuncionario').submit();
 }
+function enviarFormPesquisa() {
+	$('#formPesquisa').submit();
+}
 
 function editar(e) {
 	$("#box-msg").remove();
@@ -118,6 +121,17 @@ function editar(e) {
 
 		$("#modalMsg").modal("show");
 	});
+}
+
+function excluir(id){
+	let resultado = confirm("Deseja realmente excluir o funcionario #" + id + " ?");
+	
+	if (resultado) {
+		let url = $('#formFuncionario').attr('action') + "/excluir?id=" + id;
+
+		window.location.href = url;
+	}
+
 }
 
 function configDadosEdicao(json) {
@@ -187,4 +201,3 @@ function showPreloader() {
 function hidePreloader() {
 	document.getElementById('preloader').style.display = 'none';
 }
-

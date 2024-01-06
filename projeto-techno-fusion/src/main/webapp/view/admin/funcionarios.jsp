@@ -9,6 +9,18 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%
 String contexto = request.getContextPath() + "/view/admin/";
+
+String valorPesquisa = (String) request.getAttribute("valorPesquisa");
+
+String urlLink = "";
+
+if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
+	urlLink = request.getContextPath() + "/funcionario/pesquisar?valor=" + valorPesquisa + "&page=";
+
+}else{
+	urlLink = request.getContextPath() + "/funcionario?page=";
+}
+
 %>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -66,7 +78,7 @@ String contexto = request.getContextPath() + "/view/admin/";
                     <path stroke-linecap="round" stroke-linejoin="round"
 										d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                   </svg>
-							</span> <input type="text" class="form-control ps-0"
+							</span> <input type="text" class="form-control ps-0" 
 								placeholder="Search">
 						</div>
 					</div>
@@ -249,22 +261,34 @@ String contexto = request.getContextPath() + "/view/admin/";
 								</div>
 							</div>
 							<div class="card-body px-0 py-0">
-								<div
-									class="border-bottom py-2 px-3 d-sm-flex align-items-center">
-									<div class="input-group w-sm-25 ms-auto">
-										<span class="input-group-text text-body"> <svg
-												xmlns="http://www.w3.org/2000/svg" width="16px"
-												height="16px" fill="none" viewBox="0 0 24 24"
-												stroke-width="1.5" stroke="currentColor">
-							  <path stroke-linecap="round" stroke-linejoin="round"
-													d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
-							</svg>
-										</span> <input type="text" class="form-control" placeholder="Search">
+								<form action="<%=request.getContextPath() + "/funcionario/pesquisar"%>" id="formPesquisa">
+									<div class="border-bottom py-2 px-3 d-sm-flex align-items-center">
+											<button type="button" onclick="enviarFormPesquisa()" class="input-group-text text-body"> 
+												<svg
+													xmlns="http://www.w3.org/2000/svg" width="16px"
+													height="16px" fill="none" viewBox="0 0 24 24"
+													stroke-width="1.5" stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round"
+														d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
+											</svg>
+											<span class="font-weight-bold mb-0">Pesquisar</span>
+											</button></a> 
+											<input type="text" class="form-control" placeholder="Search" value="${valorPesquisa}" name="valor">
+
+											<a href = "<%=request.getContextPath() + "/funcionario"%>">
+												<button type="button" class="input-group-text text-body"> 
+
+												<span class="font-weight-bold mb-0">Cancelar</span>
+												</button>
+											</a>
 									</div>
-								</div>
-								<div class="table-responsive p-0">
-									<table class="table align-items-center mb-0">
-										<thead class="bg-gray-100">
+								</form>
+
+									<c:choose>
+										<c:when test="${not empty pagination.content}">
+										<div class="table-responsive p-0">
+											<table class="table table-sm table-striped align-items-center mb-0">
+											<thead class="bg-gray-100">
 											<tr>
 												<th
 													class="text-secondary text-xs font-weight-semibold opacity-7">Nome</th>
@@ -274,7 +298,7 @@ String contexto = request.getContextPath() + "/view/admin/";
 													class="text-center text-secondary text-xs font-weight-semibold opacity-7">Perfil</th>
 												<th
 													class="text-center text-secondary text-xs font-weight-semibold opacity-7">Salário</th>
-												<th class="text-secondary opacity-7"></th>
+												<th class="text-secondary opacity-7">Ações</th>
 											</tr>
 										</thead>
 										<tbody>
@@ -299,24 +323,30 @@ String contexto = request.getContextPath() + "/view/admin/";
 													<td class="align-middle text-center"><span
 														class="badge badge-sm border border-success text-sm font-weight-semibold mb-0 text-success bg-success">R$
 															${f.salario}</span></td>
-													<td class="align-middle"><a onclick="editar(this)"
-														id="${f.id}"
-														class="text-secondary font-weight-bold text-xs"
+													<td class="align-middle">
+													
+													<img onclick="editar(this)" id="${f.id}" src="<%=contexto%>assets/img/editar.png" class="px-3"
 														data-bs-toggle="tooltip"
-														data-bs-title="Editar funcionario"> <svg width="20"
-																height="20" viewBox="0 0 21 22" fill="none"
-																xmlns="http://www.w3.org/2000/svg">
-									<path
-																	d="M11.2201 2.02495C10.8292 1.63482 10.196 1.63545 9.80585 2.02636C9.41572 2.41727 9.41635 3.05044 9.80726 3.44057L11.2201 2.02495ZM12.5572 6.18502C12.9481 6.57516 13.5813 6.57453 13.9714 6.18362C14.3615 5.79271 14.3609 5.15954 13.97 4.7694L12.5572 6.18502ZM11.6803 1.56839L12.3867 2.2762L12.3867 2.27619L11.6803 1.56839ZM14.4302 4.31284L15.1367 5.02065L15.1367 5.02064L14.4302 4.31284ZM3.72198 15V16C3.98686 16 4.24091 15.8949 4.42839 15.7078L3.72198 15ZM0.999756 15H-0.000244141C-0.000244141 15.5523 0.447471 16 0.999756 16L0.999756 15ZM0.999756 12.2279L0.293346 11.5201C0.105383 11.7077 -0.000244141 11.9624 -0.000244141 12.2279H0.999756ZM9.80726 3.44057L12.5572 6.18502L13.97 4.7694L11.2201 2.02495L9.80726 3.44057ZM12.3867 2.27619C12.7557 1.90794 13.3549 1.90794 13.7238 2.27619L15.1367 0.860593C13.9869 -0.286864 12.1236 -0.286864 10.9739 0.860593L12.3867 2.27619ZM13.7238 2.27619C14.0917 2.64337 14.0917 3.23787 13.7238 3.60504L15.1367 5.02064C16.2875 3.8721 16.2875 2.00913 15.1367 0.860593L13.7238 2.27619ZM13.7238 3.60504L3.01557 14.2922L4.42839 15.7078L15.1367 5.02065L13.7238 3.60504ZM3.72198 14H0.999756V16H3.72198V14ZM1.99976 15V12.2279H-0.000244141V15H1.99976ZM1.70617 12.9357L12.3867 2.2762L10.9739 0.86059L0.293346 11.5201L1.70617 12.9357Z"
-																	fill="#64748B" />
-								  </svg>
-													</a></td>
+														data-bs-title="Editar funcionário"> 
+													
+													<img onclick="excluir(${f.id})" src="<%=contexto%>assets/img/excluir.png" class="px-3" data-bs-toggle="tooltip"
+														data-bs-title="Excluir funcionário">
+													
+													</td>
 												</tr>
 											</c:forEach>
 
 										</tbody>
 									</table>
 								</div>
+										</c:when>
+										<c:otherwise>
+											<div class="px-3 py-2">
+												<p class="mb-0">Nenhum registro encontrado!</p>
+                                        	</div>
+										</c:otherwise>
+									</c:choose>
+									
 								<div class="border-top py-3 px-3 d-flex align-items-center">
 									<p class="font-weight-semibold mb-0 text-dark text-sm">Página
 										${pagination.pageable.pageNumber} de ${pagination.totalPages}</p>
@@ -326,7 +356,7 @@ String contexto = request.getContextPath() + "/view/admin/";
 												<c:choose>
 													<c:when test="${pagination.pageable.pageNumber > 1}">
 														<li class="page-item"><a
-															href="<%=request.getContextPath() + "/funcionario?page="%>${pagination.pageable.pageNumber - 1}"
+															href="<%=urlLink%>${pagination.pageable.pageNumber - 1}"
 															class="btn btn-white mb-0">Anterior</a></li>
 													</c:when>
 
@@ -347,7 +377,7 @@ String contexto = request.getContextPath() + "/view/admin/";
 														<c:otherwise>
 															<li class="page-item"><a
 																class="btn btn-white mb-0 page-link"
-																href="<%=request.getContextPath() + "/funcionario?page="%>${i}">${i}</a>
+																href="<%=urlLink%>${i}">${i}</a>
 															</li>
 														</c:otherwise>
 													</c:choose>
@@ -358,7 +388,7 @@ String contexto = request.getContextPath() + "/view/admin/";
 													<c:when
 														test="${pagination.pageable.pageNumber < pagination.totalPages}">
 														<li class="page-item"><a class="btn btn-white mb-0"
-															href="<%=request.getContextPath() + "/funcionario?page="%>${pagination.pageable.pageNumber + 1}">Próximo</a></li>
+															href="<%=urlLink%>${pagination.pageable.pageNumber + 1}">Próximo</a></li>
 													</c:when>
 
 													<c:otherwise>
