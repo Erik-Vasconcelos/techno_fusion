@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.jdevtreinamentos.tf.model.enumeration.EnumSexo;
 import br.com.jdevtreinamentos.tf.model.enumeration.PerfilFuncionario;
 import lombok.AllArgsConstructor;
@@ -35,6 +37,12 @@ public class Funcionario {
 	private String senha;
 	private Set<Telefone> telefones = new LinkedHashSet<>();
 
+	public void setTelefones(Set<Telefone> telefones) {
+		telefones.forEach(t -> t.setFuncionario(this));
+		this.telefones = telefones;
+	}
+
+	@JsonIgnore
 	public boolean isNovo() {
 		if (id == null || id.equals(0L)) {
 			return true;

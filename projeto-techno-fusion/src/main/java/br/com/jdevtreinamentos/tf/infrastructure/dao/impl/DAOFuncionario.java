@@ -7,25 +7,29 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import br.com.jdevtreinamentos.tf.infrastructure.connection.FabricaConexao;
 import br.com.jdevtreinamentos.tf.infrastructure.dao.service.EntidadeGenericaDAO;
 import br.com.jdevtreinamentos.tf.model.Funcionario;
+import br.com.jdevtreinamentos.tf.model.Telefone;
 import br.com.jdevtreinamentos.tf.model.enumeration.EnumSexo;
 import br.com.jdevtreinamentos.tf.model.enumeration.PerfilFuncionario;
+import br.com.jdevtreinamentos.tf.util.Calculador;
 import br.com.jdevtreinamentos.tf.util.Pageable;
 import br.com.jdevtreinamentos.tf.util.Pagination;
 
 /**
  * Classe que implementa o padrão de projeto Data Acess Object - DAO que separa
  * as regras de negócio do código de infraestrutura, neste caso, dos cógigos de
- * acesso ao banco de dados sobre tabela de <strong>Funcionário<strong>.
+ * acesso ao banco de dados sobre a tabela de <strong>Funcionário<strong>.
  * 
  * @author Erik Vasconcelos
  * @since 2023-12-18
- * @version 0.1 2023-12-18
+ * @version 0.2 2024-01-08
  */
 
 public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcionario> {
@@ -34,12 +38,14 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 
 	private Connection conexao;
 	private PreparedStatement stmt;
+	private DAOTelefone daoTelefone;
 
+	
+	//TODO - Excluir todo os telefones do funcionario
 	public DAOFuncionario() {
 		conexao = FabricaConexao.getConnection();
+		daoTelefone = new DAOTelefone();
 	}
-
-	// TODO - Realizar as atualizacoes de métodos necessarios na interface
 
 	@Override
 	public Funcionario salvar(Funcionario entidade) {
@@ -68,6 +74,11 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 				boolean temProximo = resultado.next();
 
 				if (temProximo) {
+					
+					if(entidade.getTelefones().size() > 0) {
+						daoTelefone.salvar(entidade.getTelefones());
+					}
+					
 					optional = buscarPorId(resultado.getLong("id"));
 
 					entidade.setId(optional.get().getId());
@@ -96,6 +107,10 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 					salvarImagem(entidade);
 				}
 
+				if(entidade.getTelefones().size() > 0) {
+					daoTelefone.salvar(entidade.getTelefones());
+				}
+				
 				optional = buscarPorId(entidade.getId());
 			}
 
@@ -148,6 +163,10 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 				funcionario.setSalario(resultado.getDouble("salario"));
 				funcionario.setImagem(resultado.getString("imagem"));
 				funcionario.setLogin(resultado.getString("login"));
+				
+				Set<Telefone> telefones = new LinkedHashSet<>(daoTelefone.buscarTelefonesPorFuncionario(id));
+				
+				funcionario.setTelefones(telefones);
 
 				optional = Optional.of(funcionario);
 			}
@@ -193,35 +212,6 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 		return funcionarios;
 	}
 
-	public List<Funcionario> obterListPreview() {
-		List<Funcionario> funcionarios = new ArrayList<>();
-		try {
-			String sql = "SELECT f.id, f.nome, f.sexo, f.email, f.perfil, f.salario FROM funcionario f ORDER BY id DESC";
-			stmt = conexao.prepareStatement(sql);
-
-			ResultSet resultado = stmt.executeQuery();
-			FabricaConexao.connectionCommit();
-
-			while (resultado.next()) {
-				Funcionario funcionario = new Funcionario();
-				funcionario.setId(resultado.getLong("id"));
-				funcionario.setNome(resultado.getString("nome"));
-				funcionario.setSexo(EnumSexo.toEnumBySigla(resultado.getString("sexo")));
-				funcionario.setEmail(resultado.getString("email"));
-				funcionario.setSalario(resultado.getDouble("salario"));
-				funcionario.setPerfil(PerfilFuncionario.toEnum(resultado.getString("perfil")));
-
-				funcionarios.add(funcionario);
-			}
-
-		} catch (SQLException e) {
-			FabricaConexao.connectionRollback();
-			e.printStackTrace();
-		}
-
-		return funcionarios;
-	}
-
 	@Override
 	public Pagination<Funcionario> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina) {
 		Pagination<Funcionario> pagination = new Pagination<>();
@@ -251,7 +241,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 			}
 
 			int qtdRegistros = obterTotalRegistros();
-			int totalPaginas = obterTotalPaginas(qtdRegistros, registrosPorPagina);
+			int totalPaginas = Calculador.obterTotalPaginas(qtdRegistros, registrosPorPagina);
 
 			pagination.setContent(funcionarios);
 			pagination.setTotalPages(totalPaginas);
@@ -266,6 +256,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 		return pagination;
 	}
 
+	@Override
 	public Pagination<Funcionario> obterRegistrosPaginadosPreviewPorNome(String parteNome, Integer numeroPagina,
 			Integer registrosPorPagina) {
 		Pagination<Funcionario> pagination = new Pagination<>();
@@ -298,7 +289,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 			}
 
 			int qtdRegistros = obterTotalRegistrosPorNome(parteNome);
-			int totalPaginas = obterTotalPaginas(qtdRegistros, registrosPorPagina);
+			int totalPaginas = Calculador.obterTotalPaginas(qtdRegistros, registrosPorPagina);
 
 			pagination.setContent(funcionarios);
 			pagination.setTotalPages(totalPaginas);
@@ -331,6 +322,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 		return false;
 	}
 
+	@Override
 	public int obterTotalRegistros() {
 		int totalFuncionarios = 0;
 
@@ -350,6 +342,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 		return totalFuncionarios;
 	}
 
+	@Override
 	public int obterTotalRegistrosPorNome(String parteNome) {
 		int total = 0;
 		try {
@@ -366,19 +359,26 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 
 		return total;
 	}
+	
+	@Override
+	public boolean registroExiste(Long id) {
+		boolean existe = false;
 
-	public int obterTotalPaginas(int qtdRegistros, int registrosPorPagina) {
-		int total = qtdRegistros / registrosPorPagina;
+		try {
+			String sql = "SELECT COUNT(*) FROM funcionario WHERE id = ?";
+			PreparedStatement stmtVerificar = conexao.prepareStatement(sql);
+			stmtVerificar.setLong(1, id);
 
-		if (qtdRegistros % registrosPorPagina > 0) {
-			total++;
+			ResultSet resultadoVerificar = stmtVerificar.executeQuery();
+			resultadoVerificar.next();
+
+			existe = resultadoVerificar.getInt(1) > 0;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 
-		if (total == 0) {
-			total++;
-		}
-
-		return total;
+		return existe;
 	}
 
 	public boolean loginExiste(String login) {
@@ -424,26 +424,6 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 		}
 
 		return false;
-	}
-
-	public boolean registroExiste(Long id) {
-		boolean existe = false;
-
-		try {
-			String sql = "SELECT COUNT(*) FROM funcionario WHERE id = ?";
-			PreparedStatement stmtVerificar = conexao.prepareStatement(sql);
-			stmtVerificar.setLong(1, id);
-
-			ResultSet resultadoVerificar = stmtVerificar.executeQuery();
-			resultadoVerificar.next();
-
-			existe = resultadoVerificar.getInt(1) > 0;
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return existe;
 	}
 
 }

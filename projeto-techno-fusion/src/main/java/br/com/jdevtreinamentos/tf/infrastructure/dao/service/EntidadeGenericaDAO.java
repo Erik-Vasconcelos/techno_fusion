@@ -11,19 +11,28 @@ import br.com.jdevtreinamentos.tf.util.Pagination;
  * 
  * @author Erik Vasconcelos
  * @since 2023-12-18
- * @version 0.1 2023-12-18
+ * @version 0.2 2024-01-08
  */
 
-public interface EntidadeGenericaDAO<T>{
+public interface EntidadeGenericaDAO<T> {
 
 	public T salvar(T entidade);
 
 	public Optional<T> buscarPorId(Long id);
-	
+
 	public List<T> obterTodos();
-	
+
 	public Pagination<T> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina);
 
+	public Pagination<T> obterRegistrosPaginadosPreviewPorNome(String parteNome, Integer numeroPagina,
+			Integer registrosPorPagina);
+
 	public boolean excluirPorId(Long id);
-	
+
+	public int obterTotalRegistros();
+
+	public int obterTotalRegistrosPorNome(String parteNome);
+
+	public boolean registroExiste(Long id);
+
 }

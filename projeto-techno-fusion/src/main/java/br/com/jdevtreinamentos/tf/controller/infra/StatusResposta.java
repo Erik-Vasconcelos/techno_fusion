@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
  * 
  * @author Erik Vasconcelos
  * @since 2023-12-28
- * @version 0.1 2023-12-28
+ * @version 0.2 2024-01-05
  */
 
 @AllArgsConstructor

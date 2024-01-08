@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (imgString != '') {
 		$('#box-img').attr('src', imgString);
 	}
+
 	$("#preloader").hide();
 });
 
@@ -72,8 +73,6 @@ function previewImage() {
 			reader.readAsDataURL(file);
 		}
 
-
-
 	} else {
 		imagePreview.src = '/projeto-techno-fusion/view/admin/assets/img/usuario.png';
 	}
@@ -102,6 +101,7 @@ function editar(e) {
 		success: function (response) {
 			var json = JSON.parse(response);
 			configDadosEdicao(json);
+			atualizarTabela();
 
 			setTabEdicao();
 		},
@@ -123,15 +123,205 @@ function editar(e) {
 	});
 }
 
-function excluir(id){
+function excluir(id) {
 	let resultado = confirm("Deseja realmente excluir o funcionario #" + id + " ?");
-	
+
 	if (resultado) {
 		let url = $('#formFuncionario').attr('action') + "/excluir?id=" + id;
 
 		window.location.href = url;
 	}
 
+}
+
+/*
+function adicionarTelefone() {
+	var novoTelefone = removerFormatacaoTelefone($('#inputTelefone').val());
+	var telefonesJSON = $('#telefones');
+	var tabela = $('#tabelaTelefones tbody');
+
+	if (novoTelefone !== null && novoTelefone !== '') {
+		var telefonesArray = JSON.parse(telefonesJSON.val() || '[]');
+		var novoTelefoneJSON = { "numero": novoTelefone };
+
+		var containsTelefone = telefonesArray.some(function (telefoneItem) {
+			return JSON.stringify(telefoneItem) === JSON.stringify(novoTelefoneJSON);
+		});
+
+		if (!containsTelefone) {
+			telefonesArray.push(novoTelefoneJSON);
+			var json = JSON.stringify(telefonesArray);
+
+			JSON.stringify(telefonesArray)
+
+			telefonesJSON.val(json);
+
+			atualizarTabela();
+
+			$("#inputTelefone").val("");
+
+		} else {
+			alert('Este telefone já existe na lista.');
+		}
+	} else {
+		alert('Por favor, insira um número de telefone válido.');
+	}
+}*/
+
+function adicionarTelefone() {
+	var novoTelefone = removerFormatacaoTelefone($('#inputTelefone').val());
+	var telefoneTemp = removerFormatacaoTelefone($('#telefoneTemp').val());
+	var telefonesJSON = $('#telefones');
+	var tabela = $('#tabelaTelefones tbody');
+
+	if (telefoneTemp !== null && telefoneTemp !== '') {
+		var telefonesArray = JSON.parse(telefonesJSON.val() || '[]');
+
+		// Verificar se o telefoneTemp já existe na lista de telefones
+		var telefoneExistenteIndex = telefonesArray.findIndex(function (telefoneItem) {
+			return telefoneItem.numero === telefoneTemp;
+		});
+
+		if (telefoneExistenteIndex !== -1) {
+			// Atualizar apenas o atributo "numero" do JSON
+			telefonesArray[telefoneExistenteIndex].numero = novoTelefone;
+			var json = JSON.stringify(telefonesArray);
+
+			telefonesJSON.val(json);
+
+			atualizarTabela();
+
+			$("#telefoneTemp").val("");
+			$("#inputTelefone").val("");
+
+		} else {
+			alert('O telefone a ser atualizado não foi encontrado na lista.');
+		}
+	} else if (novoTelefone !== null && novoTelefone !== '') {
+		var telefonesArray = JSON.parse(telefonesJSON.val() || '[]');
+		var novoTelefoneJSON = { "numero": novoTelefone };
+
+		var containsTelefone = telefonesArray.some(function (telefoneItem) {
+			return JSON.stringify(telefoneItem) === JSON.stringify(novoTelefoneJSON);
+		});
+
+		if (!containsTelefone) {
+			telefonesArray.push(novoTelefoneJSON);
+			var json = JSON.stringify(telefonesArray);
+
+			telefonesJSON.val(json);
+
+			atualizarTabela();
+
+			$("#inputTelefone").val("");
+
+		} else {
+			alert('Este telefone já existe na lista.');
+		}
+	} else {
+		alert('Por favor, insira um número de telefone válido.');
+	}
+}
+
+
+
+
+
+function editarTelefone(numeroLinha) {
+	const tabela = document.getElementById("tabelaTelefones");
+
+	if (numeroLinha <= tabela.tBodies[0].rows.length) {
+		const numeroTelefone = removerFormatacaoTelefone(tabela.tBodies[0].rows[numeroLinha - 1].cells[1].textContent);
+
+		$("#inputTelefone").val(numeroTelefone);
+		$("#telefoneTemp").val(numeroTelefone);
+
+	} else {
+		alert(`O telefone ${numeroTelefone} não foi encontrado.`);
+	}
+}
+
+
+
+function excluirTelefone(numeroLinha) {
+	const tabela = document.getElementById("tabelaTelefones");
+
+	const linhas = tabela.tBodies[0].rows;
+
+	let resultado = confirm("Deseja realmente excluir o telefone ?");
+	if (resultado) {
+		if (linhas.length != 0 && numeroLinha <= linhas.length) {
+			numeroTelefone = removerFormatacaoTelefone(linhas[numeroLinha - 1].cells[1].textContent);
+
+			const telefonesArrayInput = $("#telefones");
+			const telefonesArray = JSON.parse(telefonesArrayInput.val());
+
+			const indiceTelefone = telefonesArray.findIndex(telefone => telefone.numero === numeroTelefone);
+			if (indiceTelefone !== -1) {
+				telefonesArray.splice(indiceTelefone, 1);
+
+				telefonesArrayInput.val(JSON.stringify(telefonesArray));
+
+				atualizarTabela();
+			} else {
+				alert(`O telefone ${numeroTelefone} não foi encontrado.`);
+			}
+		}
+	}
+}
+
+function obterNumeroProximaLinha() {
+	const tabela = document.getElementById("tabelaTelefones");
+	const linhas = tabela.tBodies[0].rows;
+	if (linhas.length === 0) {
+		return 1;
+	} else {
+		const valorLinhaAnterior = parseInt(linhas[linhas.length - 1].cells[0].textContent, 10);
+		return isNaN(valorLinhaAnterior) ? 1 : valorLinhaAnterior + 1;
+	}
+}
+
+function atualizarTabela() {
+	$('#tabelaTelefones tbody').empty();
+
+	var telefonesArray = JSON.parse($('#telefones').val() || '[]');
+
+	for (var i = 0; i < telefonesArray.length; i++) {
+		var telefone = telefonesArray[i];
+		var numeroLinha = i + 1;
+
+		var newRow = $('<tr>');
+		newRow.append('<td><h6 class="mb-0 text-sm font-weight-semibold">' + numeroLinha + '</h6></td>');
+		newRow.append('<td><div class="d-flex px-2 py-1"><div class="d-flex flex-column justify-content-center ms-1"><h6 class="mb-0 text-sm font-weight-semibold">' + formatarNumeroTelefone(telefone.numero) + '</h6></div></div></td>');
+		newRow.append('<td class="align-middle"><img onclick="editarTelefone(' + numeroLinha + ')" src="/projeto-techno-fusion/view/admin/assets/img/editar.png" class="px-3" data-bs-toggle="tooltip" data-bs-title="Editar telefone"><img onclick="excluirTelefone(' + numeroLinha + ')" src="/projeto-techno-fusion/view/admin/assets/img/excluir.png" class="px-3" data-bs-toggle="tooltip" data-bs-title="Excluir telefone"></td>');
+
+		$('#tabelaTelefones tbody').append(newRow);
+	}
+}
+
+const formatarTelefone = (event) => {
+	let input = event.target;
+	input.value = formatarNumeroTelefone(input.value);
+}
+
+const formatarNumeroTelefone = (value) => {
+	if (!value) return "";
+
+	value = value.replace(/\D/g, '');
+
+	value = value.slice(0, 11);
+	value = value.replace(/(\d{2})(\d)/, "($1) $2")
+	value = value.replace(/(\d)(\d{4})$/, "$1-$2")
+
+	return value;
+}
+
+function removerFormatacaoTelefone(value) {
+	if (!value) return "";
+
+	value = value.replace(/\D/g, '');
+
+	return value;
 }
 
 function configDadosEdicao(json) {
@@ -144,6 +334,7 @@ function configDadosEdicao(json) {
 	$('#perfil').val(json.perfil);
 	$('#login').val(json.login);
 	$('#imagemArmazenada').val(json.imagem);
+	$('#telefones').val(JSON.stringify(json.telefones));
 
 	var radio = $('input[name="sexo"][value="' + json.sexo + '"]');
 	if (radio.length > 0) {
@@ -191,7 +382,12 @@ function restaurarTab() {
 	$('#box-img').attr('src', '/projeto-techno-fusion/view/admin/assets/img/usuario.png');
 	$('#groupSenha').css("display", "block");
 	$('#input-imagem').val("");
-	
+	limparInputTelefone();
+
+}
+
+function limparInputTelefone() {
+	$("#inputTelefone").val("")
 }
 
 function showPreloader() {

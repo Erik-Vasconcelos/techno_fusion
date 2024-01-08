@@ -120,7 +120,7 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 									href="javascript:;">
 										<div class="d-flex py-1">
 											<div class="my-auto">
-												<img src="assets/img/team-2.jpg"
+												<img src="<%=contexto%>assets/img/usuario.png"
 													class="avatar avatar-sm border-radius-sm  me-3 ">
 											</div>
 											<div class="d-flex flex-column justify-content-center">
@@ -168,7 +168,7 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 														fill="#FFFFFF" fill-rule="nonzero">
                                 <g
 														transform="translate(1716.000000, 291.000000)">
-                                  <g
+                                  <gs
 														transform="translate(453.000000, 454.000000)">
                                     <path class="color-background"
 														d="M43,10.7482083 L43,3.58333333 C43,1.60354167 41.3964583,0 39.4166667,0 L3.58333333,0 C1.60354167,0 0,1.60354167 0,3.58333333 L0,10.7482083 L43,10.7482083 Z"
@@ -195,7 +195,7 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 						</li>
 						<li class="nav-item ps-2 d-flex align-items-center"><a
 							href="javascript:;" class="nav-link text-body p-0"> <img
-								src="assets/img/team-2.jpg" class="avatar avatar-sm"
+								src="<%=contexto%>assets/img/usuario.png" class="avatar avatar-sm"
 								alt="avatar" />
 						</a></li>
 					</ul>
@@ -213,25 +213,6 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 							<p class="mb-0">Todos os serviços relacionados a gestão dos
 								funcionários da empresa</p>
 						</div>
-						<button type="button"
-							class="btn btn-sm btn-white btn-icon d-flex align-items-center mb-0 ms-md-auto mb-sm-0 mb-2 me-2">
-							<span class="btn-inner--icon"> <span
-								class="p-1 bg-success rounded-circle d-flex ms-auto me-2">
-									<span class="visually-hidden">New</span>
-							</span>
-							</span> <span class="btn-inner--text">Messages</span>
-						</button>
-						<button type="button"
-							class="btn btn-sm btn-dark btn-icon d-flex align-items-center mb-0">
-							<span class="btn-inner--icon"> <svg width="16" height="16"
-									xmlns="http://www.w3.org/2000/svg" fill="none"
-									viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-									class="d-block me-2">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-										d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                  </svg>
-							</span> <span class="btn-inner--text">Sync</span>
-						</button>
 					</div>
 				</div>
 			</div>
@@ -262,7 +243,22 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 							</div>
 							<div class="card-body px-0 py-0">
 								<form action="<%=request.getContextPath() + "/funcionario/pesquisar"%>" id="formPesquisa">
-									<div class="border-bottom py-2 px-3 d-sm-flex align-items-center">
+									
+								<div class="input-group px-3 py-2">
+									<span class="btn btn-sm btn-dark btn-icon d-flex align-items-center mb-0" onclick="enviarFormPesquisa()">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" fill="#FFF" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    			<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
+                  				</svg>
+							</span> <input type="text" class="form-control px-2" placeholder="Search" value="${valorPesquisa}" name="valor">
+									
+									<a href = "<%=request.getContextPath() + "/funcionario"%>">
+									<span class="input-group-text btn-dark btn-inner--text border-end-0 " style="background-color: #D10024;">
+								Limpar
+                  				
+							</span>
+											</a>
+								</div>
+									<%-- <div class="border-bottom py-2 px-3 d-sm-flex align-items-center">
 											<button type="button" onclick="enviarFormPesquisa()" class="input-group-text text-body"> 
 												<svg
 													xmlns="http://www.w3.org/2000/svg" width="16px"
@@ -281,7 +277,7 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 												<span class="font-weight-bold mb-0">Cancelar</span>
 												</button>
 											</a>
-									</div>
+									</div> --%>
 								</form>
 
 									<c:choose>
@@ -298,7 +294,7 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 													class="text-center text-secondary text-xs font-weight-semibold opacity-7">Perfil</th>
 												<th
 													class="text-center text-secondary text-xs font-weight-semibold opacity-7">Salário</th>
-												<th class="text-secondary opacity-7">Ações</th>
+												<th class="text-secondary opacity-7 text-xs font-weight-semibold opacity-7">Ações</th>
 											</tr>
 										</thead>
 										<tbody>
@@ -347,10 +343,15 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 										</c:otherwise>
 									</c:choose>
 									
-								<div class="border-top py-3 px-3 d-flex align-items-center">
-									<p class="font-weight-semibold mb-0 text-dark text-sm">Página
+								<div class="row align-items-center border-top py-3 px-3">
+
+									<div class="col-md-3">
+									<p class="font-weight-semibold mb-3 text-dark text-sm">Página
 										${pagination.pageable.pageNumber} de ${pagination.totalPages}</p>
-									<div class="ms-auto">
+
+									</div>	
+
+									<div class="col-md-9">
 										<nav>
 											<ul class="pagination justify-content-end">
 												<c:choose>
@@ -428,6 +429,12 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 										id="operacaoErro"> <input type="hidden"
 										value="${resposta.artefato.imagem}" id="imagemArmazenada"
 										name="imagemArmazenada">
+
+									<input type="hidden"
+										value="${telefonesJson}" id="telefones"
+										name="telefones">
+
+									<input type="hidden" id="telefoneTemp">
 
 									<div class="form-group">
 										<label for="id" class="form-control-label">Id</label> <input
@@ -565,11 +572,74 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 											id="senha">
 									</div>
 
+									<h6 class="font-weight-semibold text-lg mb-0 mt-2">Telefones</h6>
+									<hr>
+
+									<div class="form-group">
+									<label for="inputTelefone" class="form-control-label">Telefone</label>
+
+									<div class="input-group">
+									<span class="btn btn-sm btn-dark btn-icon d-flex align-items-center mb-0" onclick="adicionarTelefone()">Save</span> 
+									
+									<input class="form-control" type="text"
+											value=""
+											id="inputTelefone" onkeyup="formatarTelefone(event)">
+									
+									<span class="input-group-text btn-dark btn-inner--text border-end-0 " style="background-color: #D10024;" onclick="limparInputTelefone()">
+								Limpar
+                  				
+							</span>
+								</div>
+								</div>
+
+									<div class="table-responsive p-0">
+											<table class="table table-sm table-striped align-items-center mb-0" id="tabelaTelefones">
+											<thead class="bg-gray-100">
+											<tr>
+												<th
+													class="text-secondary text-xs font-weight-semibold opacity-7">Telefone</th>
+												<th
+													class="text-secondary text-xs font-weight-semibold opacity-7">Número</th>
+												<th class="text-secondary opacity-7 text-xs font-weight-semibold opacity-7">Ações</th>
+											</tr>
+										</thead>
+										<tbody>
+										 <%!int number = 1;%>
+											<c:forEach items="${}" var="f">
+												<tr>
+													<td>
+														<div class="d-flex px-2 py-1">
+															<h6 class="mb-0 text-sm font-weight-semibold"><%=number ++%></h6>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex px-2 py-1">
+															<div
+																class="d-flex flex-column justify-content-center ms-1">
+																<h6 class="mb-0 text-sm font-weight-semibold">${f.nome}</h6>
+															</div>
+														</div>
+													</td>
+													<td class="align-middle">
+													
+													<img onclick="editarTelfone()" src="<%=contexto%>assets/img/editar.png" class="px-3"
+														data-bs-toggle="tooltip"
+														data-bs-title="Editar telefone"> 
+													
+													<img onclick="excluirTelefone()" src="<%=contexto%>assets/img/excluir.png" class="px-3" data-bs-toggle="tooltip"
+														data-bs-title="Excluir telefone">
+													
+													</td>
+												</tr>
+											</c:forEach>
+
+										</tbody>
+									</table>
+								</div>
+
 									<div class="card-body px-0 py-2">
 										<div class="ms-auto d-flex align-items-center"
 											id="btn-acoes-form">
-											<%-- <input type="submit" class="btn btn-success me-2"
-												value="Salvar"> --%>
 											<button type="button" class="btn btn-success me-2"
 												onclick="enviarForm()">Salvar</button>
 
@@ -600,119 +670,14 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 							<script>
 								document.write(new Date().getFullYear())
 							</script>
-							Corporate UI by <a href="https://www.creative-tim.com"
-								class="text-secondary" target="_blank">Creative Tim</a>.
+							
 						</div>
-					</div>
-					<div class="col-lg-6">
-						<ul
-							class="nav nav-footer justify-content-center justify-content-lg-end">
-							<li class="nav-item"><a href="https://www.creative-tim.com"
-								class="nav-link text-xs text-muted" target="_blank">Creative
-									Tim</a></li>
-							<li class="nav-item"><a
-								href="https://www.creative-tim.com/presentation"
-								class="nav-link text-xs text-muted" target="_blank">About Us</a>
-							</li>
-							<li class="nav-item"><a
-								href="https://www.creative-tim.com/blog"
-								class="nav-link text-xs text-muted" target="_blank">Blog</a></li>
-							<li class="nav-item"><a
-								href="https://www.creative-tim.com/license"
-								class="nav-link text-xs pe-0 text-muted" target="_blank">License</a>
-							</li>
-						</ul>
 					</div>
 				</div>
 			</div>
 		</footer>
 		</div>
 	</main>
-	<div class="fixed-plugin">
-		<a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
-			<i class="fa fa-cog py-2"></i>
-		</a>
-		<div class="card shadow-lg ">
-			<div class="card-header pb-0 pt-3 ">
-				<div class="float-start">
-					<h5 class="mt-3 mb-0">Corporate UI Configurator</h5>
-					<p>See our Início options.</p>
-				</div>
-				<div class="float-end mt-4">
-					<button
-						class="btn btn-link text-dark p-0 fixed-plugin-close-button">
-						<i class="fa fa-close"></i>
-					</button>
-				</div>
-				<!-- End Toggle Button -->
-			</div>
-			<hr class="horizontal dark my-1">
-			<div class="card-body pt-sm-3 pt-0">
-				<!-- Sidebar Backgrounds -->
-				<div>
-					<h6 class="mb-0">Sidebar Colors</h6>
-				</div>
-				<a href="javascript:void(0)" class="switch-trigger background-color">
-					<div class="badge-colors my-2 text-start">
-						<span class="badge filter bg-gradient-primary active"
-							data-color="primary" onclick="sidebarColor(this)"></span> <span
-							class="badge filter bg-gradient-info" data-color="info"
-							onclick="sidebarColor(this)"></span> <span
-							class="badge filter bg-gradient-success" data-color="success"
-							onclick="sidebarColor(this)"></span> <span
-							class="badge filter bg-gradient-warning" data-color="warning"
-							onclick="sidebarColor(this)"></span> <span
-							class="badge filter bg-gradient-danger" data-color="danger"
-							onclick="sidebarColor(this)"></span>
-					</div>
-				</a>
-				<!-- Sidenav Type -->
-				<div class="mt-3">
-					<h6 class="mb-0">Sidenav Type</h6>
-					<p class="text-sm">Choose between 2 different sidenav types.</p>
-				</div>
-				<div class="d-flex">
-					<button class="btn bg-gradient-primary w-100 px-3 mb-2 active"
-						data-class="bg-slate-900" onclick="sidebarType(this)">Dark</button>
-					<button class="btn bg-gradient-primary w-100 px-3 mb-2 ms-2"
-						data-class="bg-white" onclick="sidebarType(this)">White</button>
-				</div>
-				<p class="text-sm d-xl-none d-block mt-2">You can change the
-					sidenav type just on desktop view.</p>
-				<!-- Navbar Fixed -->
-				<div class="mt-3">
-					<h6 class="mb-0">Navbar Fixed</h6>
-				</div>
-				<div class="form-check form-switch ps-0">
-					<input class="form-check-input mt-1 ms-auto" type="checkbox"
-						id="navbarFixed" onclick="navbarFixed(this)">
-				</div>
-				<hr class="horizontal dark my-sm-4">
-				<a class="btn bg-gradient-dark w-100"
-					href="https://www.creative-tim.com/product/corporate-ui-dashboard">Free
-					Download</a> <a class="btn btn-outline-dark w-100"
-					href="https://www.creative-tim.com/learning-lab/bootstrap/license/corporate-ui-dashboard">View
-					documentation</a>
-				<div class="w-100 text-center">
-					<a class="github-button"
-						href="https://github.com/creativetimofficial/corporate-ui-dashboard"
-						data-icon="octicon-star" data-size="large" data-show-count="true"
-						aria-label="Star creativetimofficial/corporate-ui-dashboard on GitHub">Star</a>
-					<h6 class="mt-3">Thank you for sharing!</h6>
-					<a
-						href="https://twitter.com/intent/tweet?text=Check%20Corporate%20UI%20Dashboard%20made%20by%20%40CreativeTim%20%23webdesign%20%23dashboard%20%23bootstrap5&amp;url=https%3A%2F%2Fwww.creative-tim.com%2Fproduct%2Fcorporate-ui-dashboard"
-						class="btn btn-dark mb-0 me-2" target="_blank"> <i
-						class="fab fa-twitter me-1" aria-hidden="true"></i> Tweet
-					</a> <a
-						href="https://www.facebook.com/sharer/sharer.php?u=https://www.creative-tim.com/product/corporate-ui-dashboard"
-						class="btn btn-dark mb-0 me-2" target="_blank"> <i
-						class="fab fa-facebook-square me-1" aria-hidden="true"></i> Share
-					</a>
-				</div>
-			</div>
-		</div>
-	</div>
-
 	<!-- Button trigger modal -->
 
 	<div class="modal fade" id="modalMsg" data-bs-backdrop="static"
@@ -738,18 +703,6 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 	<jsp:include page="fragmentos/scripts.jsp"></jsp:include>
 
 	<script src="<%=contexto%>assets/js/script-funcionario.js"></script>
-
-
-
-	<%-- <script>
-    var win = navigator.platform.indexOf('Win') > -1;
-    if (win && document.querySelector('#sidenav-scrollbar')) {
-      var options = {
-        damping: '0.5'
-      }
-      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-    }
-  </script> --%>
 </body>
 
 </html>

@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -19,6 +20,7 @@ import javax.servlet.http.Part;
 import org.apache.commons.io.IOUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
@@ -28,8 +30,10 @@ import br.com.jdevtreinamentos.tf.controller.infra.StatusResposta;
 import br.com.jdevtreinamentos.tf.exception.DadosInvalidosException;
 import br.com.jdevtreinamentos.tf.infrastructure.dao.impl.DAOFuncionario;
 import br.com.jdevtreinamentos.tf.model.Funcionario;
+import br.com.jdevtreinamentos.tf.model.Telefone;
 import br.com.jdevtreinamentos.tf.model.enumeration.EnumSexo;
 import br.com.jdevtreinamentos.tf.model.enumeration.PerfilFuncionario;
+import br.com.jdevtreinamentos.tf.util.Calculador;
 import br.com.jdevtreinamentos.tf.util.GeradorSenha;
 import br.com.jdevtreinamentos.tf.util.Pagination;
 
@@ -103,8 +107,7 @@ public class FuncionarioController extends HttpServlet {
 						daoFuncionario.excluirPorId(id);
 						
 						ResponseEntity<Funcionario> resposta = gerarReposta(Funcionario.class, StatusResposta.SUCCESS, null,
-								"Funcionario #" + id + " excluído com sucesso" );
-						request.setAttribute("resposta", resposta);
+								"Funcionario #" + id + " excluído com sucesso");
 						
 						request.getSession().setAttribute("resposta", resposta);
 
@@ -127,7 +130,7 @@ public class FuncionarioController extends HttpServlet {
 					if (pageString != null && !pageString.trim().isEmpty()) {
 						int pagina = Integer.parseInt(pageString);
 
-						int totalPaginas = daoFuncionario.obterTotalPaginas(
+						int totalPaginas = Calculador.obterTotalPaginas(
 								daoFuncionario.obterTotalRegistrosPorNome(valor), REGISTROS_POR_PAGINA);
 
 						boolean paginaValida = pagina > 0 && pagina <= totalPaginas;
@@ -154,7 +157,7 @@ public class FuncionarioController extends HttpServlet {
 				if (pageString != null && !pageString.trim().isEmpty()) {
 					int pagina = Integer.parseInt(pageString);
 
-					int totalPaginas = daoFuncionario.obterTotalPaginas(daoFuncionario.obterTotalRegistros(),
+					int totalPaginas = Calculador.obterTotalPaginas(daoFuncionario.obterTotalRegistros(),
 							REGISTROS_POR_PAGINA);
 
 					boolean paginaValida = pagina > 0 && pagina <= totalPaginas;
@@ -199,6 +202,8 @@ public class FuncionarioController extends HttpServlet {
 
 			String imgArmazenadaNaPagina = request.getParameter("imagemArmazenada");
 
+			String jsonTelefones = request.getParameter("telefones");
+			
 			funcionario = new Funcionario();
 			funcionario.setNome(nome);
 			funcionario.setSexo(sexo);
@@ -207,10 +212,21 @@ public class FuncionarioController extends HttpServlet {
 			funcionario.setSalario(salario);
 			funcionario.setPerfil(perfil);
 			funcionario.setLogin(login);
-
+			
 			if (idTexto != null && !idTexto.trim().isEmpty()) {
 				funcionario.setId(Long.parseLong(idTexto));
 			}
+			
+			ObjectMapper objectMapper = new ObjectMapper();
+			Set<Telefone> telefones = objectMapper.readValue(jsonTelefones, new TypeReference<Set<Telefone>>() {});
+			
+			Funcionario f = new Funcionario();
+			f.setId(funcionario.getId());
+			
+			//settando o id do fun nos telefones
+			telefones.stream().forEach(t -> t.setFuncionario(f));
+			
+			funcionario.setTelefones(telefones);
 
 			Part imagemPart = request.getPart("imagem");
 			if (imagemPart != null && imagemPart.getSize() > 0) {

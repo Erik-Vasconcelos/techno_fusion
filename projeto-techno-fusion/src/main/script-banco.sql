@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS funcionario(
     nome CHARACTER VARYING(100) NOT NULL,
     sexo CHAR(1) NOT NULL,
     data_nascimento DATE NOT NULL,
-    email CHARACTER UNIQUE VARYING(100) NOT NULL,
+    email CHARACTER VARYING(100) UNIQUE NOT NULL,
     salario NUMERIC(10, 2) NOT NULL,
     imagem TEXT,
     perfil CHARACTER VARYING(30) NOT NULL,
@@ -13,12 +13,23 @@ CREATE TABLE IF NOT EXISTS funcionario(
     senha CHARACTER VARYING(50) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS telefone (
+    id INTEGER PRIMARY KEY,
+    numero CHARACTER VARYING(20) NOT NULL,
+    funcionario_id INTEGER NOT NULL
+);
 
-CREATE SEQUENCE IF NOT EXISTS funcionario_id_seq
-    INCREMENT 1
-    START 1
-    MINVALUE 1
-    MAXVALUE 2147483647
-    CACHE 1;
+CREATE SEQUENCE IF NOT EXISTS funcionario_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 
-ALTER TABLE funcionario ALTER COLUMN id SET DEFAULT nextval('funcionario_id_seq'::regclass);
+CREATE SEQUENCE IF NOT EXISTS telefone_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+ALTER TABLE funcionario
+ALTER COLUMN id
+SET DEFAULT nextval('funcionario_id_seq'::regclass);
+
+ALTER TABLE telefone
+ALTER COLUMN id
+SET DEFAULT nextval('telefone_id_seq'::regclass);
+
+ALTER TABLE telefone
+ADD CONSTRAINT fk_telefone_funcionario FOREIGN KEY (funcionario_id) REFERENCES funcionario(id);
