@@ -1,4 +1,4 @@
-package br.com.jdevtreinamentos.tf.controller;
+package br.com.jdevtreinamentos.tf.controller.display;
 
 import java.io.IOException;
 
@@ -9,23 +9,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import br.com.jdevtreinamentos.tf.controller.infra.ResponseEntity;
-import br.com.jdevtreinamentos.tf.model.Funcionario;
+import br.com.jdevtreinamentos.tf.model.Telefone;
 
 /**
  * Padrão de projeto POST - REDIRECT - GET
  * Servlet para onde o usuario é redirecionado após realizar o post de salvar/atualizar
- * o funcionario e rezlizar o tratamento das mensagens e retornat para visualiza,ão do usuário
+ * o telefone e realizar o tratamento das mensagens e retornar para visualização do usuário
  *  
  * @author Erik Vasconcelos
- * @since 2023-12-19
- * @version 0.2 2023-12-30
+ * @since 2024-01-08
+ * @version 0.2 2024-01-08
  */
 
-@WebServlet("/funcionario/display")
-public class FuncionarioControllerDisplay extends HttpServlet {
+@WebServlet("/funcionario/telefone/display")
+public class TelefoneControllerDisplay extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	public FuncionarioControllerDisplay() {
+	public TelefoneControllerDisplay() {
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -35,13 +35,15 @@ public class FuncionarioControllerDisplay extends HttpServlet {
 	
 		if (resposta != null) {
 			@SuppressWarnings("unchecked")
-			ResponseEntity<Funcionario> responseEntity = (ResponseEntity<Funcionario>) resposta;
+			ResponseEntity<Telefone> responseEntity = (ResponseEntity<Telefone>) resposta;
 			request.setAttribute("resposta", responseEntity);
 			
 			request.getSession().removeAttribute("resposta");
 		}
+		
+		String id = request.getParameter("idFuncionario");
 
-		request.getRequestDispatcher("/funcionario").forward(request, response);
+		request.getRequestDispatcher("/funcionario/telefone?idFuncionario=" + id).forward(request, response);
 	}
 
 }

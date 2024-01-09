@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -20,7 +19,6 @@ import javax.servlet.http.Part;
 import org.apache.commons.io.IOUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
@@ -28,9 +26,9 @@ import br.com.jdevtreinamentos.tf.controller.infra.OperacaoErro;
 import br.com.jdevtreinamentos.tf.controller.infra.ResponseEntity;
 import br.com.jdevtreinamentos.tf.controller.infra.StatusResposta;
 import br.com.jdevtreinamentos.tf.exception.DadosInvalidosException;
+import br.com.jdevtreinamentos.tf.exception.RecursoNaoEncontradoException;
 import br.com.jdevtreinamentos.tf.infrastructure.dao.impl.DAOFuncionario;
 import br.com.jdevtreinamentos.tf.model.Funcionario;
-import br.com.jdevtreinamentos.tf.model.Telefone;
 import br.com.jdevtreinamentos.tf.model.enumeration.EnumSexo;
 import br.com.jdevtreinamentos.tf.model.enumeration.PerfilFuncionario;
 import br.com.jdevtreinamentos.tf.util.Calculador;
@@ -47,12 +45,13 @@ import br.com.jdevtreinamentos.tf.util.Pagination;
  */
 
 @MultipartConfig
-@WebServlet(urlPatterns = { "/funcionario", "/funcionario/editar", "/funcionario/pesquisar", "/funcionario/excluir"})
+@WebServlet(urlPatterns = { "/funcionario", "/funcionario/editar", "/funcionario/excluir", "/funcionario/pesquisar",
+		"/funcionario/downloadImagem" })
 public class FuncionarioController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private static final Integer PAGINA_INICIAL = 1;
-	private static final Integer REGISTROS_POR_PAGINA = 5;
+	private static final Integer REGISTROS_POR_PAGINA = 10;
 
 	private static final Double SALARIO_MAXIMO = 100000.0;
 	private static final Integer QTD_MIN_CARACTERES_LOGIN = 5;
@@ -67,111 +66,23 @@ public class FuncionarioController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		//TODO - Implementar o download de imagem
-		
+		// FIXME - Mostrar excecao de usuario sem imagem no download
+
 		try {
-			String pageString = request.getParameter("page");
-
 			if (request.getServletPath().endsWith("editar")) {
-				String idString = request.getParameter("id");
-
-				if (idString != null && !idString.trim().isEmpty()) {
-					Long id = Long.parseLong(idString);
-
-					Optional<Funcionario> optional = daoFuncionario.buscarPorId(id);
-
-					if (optional.isPresent()) {
-						ObjectMapper mapper = JsonMapper.builder().findAndAddModules().build();
-
-						String json = mapper.writeValueAsString(optional.get());
-
-						response.getWriter().write(json);
-						response.setContentType("application/json");
-					} else {
-						response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-						response.getWriter().write("Erro: não foi possível encontrar o funcionário #" + id);
-						response.setContentType("text/plain");
-					}
-				}
+				editar(request, response);
 
 			} else if (request.getServletPath().endsWith("excluir")) {
-				
-				String idString =request.getParameter("id");
-				
-				if(idString != null && !idString.trim().isEmpty()) {
-					Long id = Long.parseLong(idString);
-					
-					boolean funcionarioExiste = daoFuncionario.registroExiste(id);
-					
-					if(funcionarioExiste) {
-						daoFuncionario.excluirPorId(id);
-						
-						ResponseEntity<Funcionario> resposta = gerarReposta(Funcionario.class, StatusResposta.SUCCESS, null,
-								"Funcionario #" + id + " excluído com sucesso");
-						
-						request.getSession().setAttribute("resposta", resposta);
+				excluir(request, response);
 
-						response.sendRedirect(request.getContextPath() + "/funcionario/display");
-					}else {
-						throw new RuntimeException("Id inválido! O Funcionario #" + id + " não existe" );
-					}
-				}else {
-					throw new IllegalArgumentException("Informe o id do funcionario a ser excluído!");
-				}
-				
-			} 
-			else if (request.getServletPath().endsWith("pesquisar")) {
-				String valor = request.getParameter("valor");
+			} else if (request.getServletPath().endsWith("pesquisar")) {
+				pesquisar(request, response);
 
-				if (valor != null && !valor.trim().isEmpty()) {
+			} else if (request.getServletPath().endsWith("downloadImagem")) {
+				downloadImagem(request, response);
 
-					Pagination<Funcionario> pagination = null;
-
-					if (pageString != null && !pageString.trim().isEmpty()) {
-						int pagina = Integer.parseInt(pageString);
-
-						int totalPaginas = Calculador.obterTotalPaginas(
-								daoFuncionario.obterTotalRegistrosPorNome(valor), REGISTROS_POR_PAGINA);
-
-						boolean paginaValida = pagina > 0 && pagina <= totalPaginas;
-
-						if (paginaValida) {
-							pagination = daoFuncionario.obterRegistrosPaginadosPreviewPorNome(valor, pagina,
-									REGISTROS_POR_PAGINA);
-
-						} else {
-							throw new IllegalArgumentException("A página #" + pagina + " não existe!");
-						}
-
-					} else {
-						pagination = daoFuncionario.obterRegistrosPaginadosPreviewPorNome(valor, PAGINA_INICIAL,
-								REGISTROS_POR_PAGINA);
-					}
-
-					request.setAttribute("valorPesquisa", valor);
-					encaminharParaPaginaFuncionarios(request, response, pagination);
-				} else {
-					throw new IllegalArgumentException("Informe um valor para realizar a pesquisa!");
-				}
 			} else {
-				if (pageString != null && !pageString.trim().isEmpty()) {
-					int pagina = Integer.parseInt(pageString);
-
-					int totalPaginas = Calculador.obterTotalPaginas(daoFuncionario.obterTotalRegistros(),
-							REGISTROS_POR_PAGINA);
-
-					boolean paginaValida = pagina > 0 && pagina <= totalPaginas;
-
-					if (paginaValida) {
-						encaminharParaPaginaFuncionarios(request, response, pagina);
-
-					} else {
-						throw new IllegalArgumentException("A página #" + pagina + " não existe!");
-					}
-
-				} else {
-					encaminharParaPaginaFuncionarios(request, response);
-				}
+				obterPagina(request, response);
 			}
 
 		} catch (Exception e) {
@@ -202,8 +113,6 @@ public class FuncionarioController extends HttpServlet {
 
 			String imgArmazenadaNaPagina = request.getParameter("imagemArmazenada");
 
-			String jsonTelefones = request.getParameter("telefones");
-			
 			funcionario = new Funcionario();
 			funcionario.setNome(nome);
 			funcionario.setSexo(sexo);
@@ -212,21 +121,10 @@ public class FuncionarioController extends HttpServlet {
 			funcionario.setSalario(salario);
 			funcionario.setPerfil(perfil);
 			funcionario.setLogin(login);
-			
+
 			if (idTexto != null && !idTexto.trim().isEmpty()) {
 				funcionario.setId(Long.parseLong(idTexto));
 			}
-			
-			ObjectMapper objectMapper = new ObjectMapper();
-			Set<Telefone> telefones = objectMapper.readValue(jsonTelefones, new TypeReference<Set<Telefone>>() {});
-			
-			Funcionario f = new Funcionario();
-			f.setId(funcionario.getId());
-			
-			//settando o id do fun nos telefones
-			telefones.stream().forEach(t -> t.setFuncionario(f));
-			
-			funcionario.setTelefones(telefones);
 
 			Part imagemPart = request.getPart("imagem");
 			if (imagemPart != null && imagemPart.getSize() > 0) {
@@ -247,7 +145,8 @@ public class FuncionarioController extends HttpServlet {
 			ResponseEntity<Funcionario> resposta = gerarReposta(Funcionario.class, StatusResposta.SUCCESS, null, "");
 
 			if (funcionario.isNovo()) {
-				String senhaGerada = GeradorSenha.gerar(funcionario);
+				String senhaGerada = GeradorSenha.gerarSenhaPadrão(funcionario);
+				
 				funcionario.setSenha(senhaGerada);
 
 				daoFuncionario.salvar(funcionario);
@@ -269,6 +168,158 @@ public class FuncionarioController extends HttpServlet {
 
 			encaminharParaPaginaFuncionarios(request, response);
 		}
+	}
+
+	private void editar(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String idString = request.getParameter("id");
+
+		if (idString != null && !idString.trim().isEmpty()) {
+			Long id = Long.parseLong(idString);
+
+			Optional<Funcionario> optional = daoFuncionario.buscarPorId(id);
+
+			if (optional.isPresent()) {
+				ObjectMapper mapper = JsonMapper.builder().findAndAddModules().build();
+
+				String json = mapper.writeValueAsString(optional.get());
+
+				response.setContentType("application/json");
+				response.getWriter().write(json);
+			} else {
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.getWriter().write("Erro: não foi possível encontrar o funcionário #" + id);
+				response.setContentType("text/plain");
+			}
+		}
+	}
+
+	private void excluir(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String idString = request.getParameter("id");
+
+		if (idString != null && !idString.trim().isEmpty()) {
+			Long id = Long.parseLong(idString);
+
+			boolean funcionarioExiste = daoFuncionario.registroExiste(id);
+
+			if (funcionarioExiste) {
+				daoFuncionario.excluirPorId(id);
+
+				ResponseEntity<Funcionario> resposta = gerarReposta(Funcionario.class, StatusResposta.SUCCESS, null,
+						"Funcionario #" + id + " excluído com sucesso");
+
+				request.getSession().setAttribute("resposta", resposta);
+
+				response.sendRedirect(request.getContextPath() + "/funcionario/display");
+			} else {
+				throw new RuntimeException("Id inválido! O Funcionario #" + id + " não existe");
+			}
+		} else {
+			throw new IllegalArgumentException("Informe o id do funcionario a ser excluído!");
+		}
+
+	}
+
+	private void pesquisar(HttpServletRequest request, HttpServletResponse response) {
+		String pageString = request.getParameter("page");
+		String valor = request.getParameter("valor");
+
+		if (valor != null && !valor.trim().isEmpty()) {
+
+			Pagination<Funcionario> pagination = null;
+
+			if (pageString != null && !pageString.trim().isEmpty()) {
+				int pagina = Integer.parseInt(pageString);
+
+				int totalPaginas = Calculador.obterTotalPaginas(daoFuncionario.obterTotalRegistrosPorNome(valor),
+						REGISTROS_POR_PAGINA);
+
+				boolean paginaValida = pagina > 0 && pagina <= totalPaginas;
+
+				if (paginaValida) {
+					pagination = daoFuncionario.obterRegistrosPaginadosPreviewPorNome(valor, pagina,
+							REGISTROS_POR_PAGINA);
+
+				} else {
+					throw new IllegalArgumentException("A página #" + pagina + " não existe!");
+				}
+
+			} else {
+				pagination = daoFuncionario.obterRegistrosPaginadosPreviewPorNome(valor, PAGINA_INICIAL,
+						REGISTROS_POR_PAGINA);
+			}
+
+			request.setAttribute("valorPesquisa", valor);
+			encaminharParaPaginaFuncionarios(request, response, pagination);
+		} else {
+			throw new IllegalArgumentException("Informe um valor para realizar a pesquisa!");
+		}
+
+	}
+
+	private void downloadImagem(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String idString = request.getParameter("idFuncionario");
+
+		if (idString != null && !idString.trim().isEmpty()) {
+			Long id = Long.parseLong(idString);
+
+			Optional<Funcionario> optional = daoFuncionario.buscarPorId(id);
+
+			if (optional.isPresent()) {
+
+				Funcionario funcionario = optional.get();
+
+				String primeiroNome = funcionario.getNome().split("\\s+")[0];
+				if (funcionario.getImagem() != null) {
+					String extensaoImagem = funcionario.getImagem().split("\\/")[1].split("\\;")[0];
+					String imagemBase64 = funcionario.getImagem().split("\\,")[1];
+
+					response.setContentType("image/" + extensaoImagem);
+
+					response.setHeader("Content-Disposition",
+							"attachment;filename=" + primeiroNome + "." + extensaoImagem);
+					// Define o por quanto tempo o browser pode armazenar em cache a imagem
+					//response.setHeader("Cache-Control", "public, max-age=3600");
+					// Define a data de imagem quando a imagem em cache vai expirar
+					//response.setDateHeader("Expires", System.currentTimeMillis() + 3600 * 1000);
+
+					// Codigo/identificador etag para a entidade imagem
+					//String etag = DigestUtils.sha256Hex(primeiroNome + extensaoImagem);
+					//response.setHeader("ETag", etag);
+
+					response.getOutputStream().write(new Base64().decode(imagemBase64));
+				} else {
+					throw new RecursoNaoEncontradoException("O funcionario " + primeiroNome + " não possui imagem!");
+				}
+
+			} else {
+				throw new RuntimeException("Id inválido! O Funcionario #" + id + " não existe");
+			}
+		} else {
+			throw new IllegalArgumentException("Informe o id do funcionario a realizar o download da imagem!");
+		}
+
+	}
+
+	private void obterPagina(HttpServletRequest request, HttpServletResponse response) {
+		String pageString = request.getParameter("page");
+		if (pageString != null && !pageString.trim().isEmpty()) {
+			int pagina = Integer.parseInt(pageString);
+
+			int totalPaginas = Calculador.obterTotalPaginas(daoFuncionario.obterTotalRegistros(), REGISTROS_POR_PAGINA);
+
+			boolean paginaValida = pagina > 0 && pagina <= totalPaginas;
+
+			if (paginaValida) {
+				encaminharParaPaginaFuncionarios(request, response, pagina);
+
+			} else {
+				throw new IllegalArgumentException("A página #" + pagina + " não existe!");
+			}
+
+		} else {
+			encaminharParaPaginaFuncionarios(request, response);
+		}
+
 	}
 
 	private void encaminharParaPaginaFuncionarios(HttpServletRequest request, HttpServletResponse response) {

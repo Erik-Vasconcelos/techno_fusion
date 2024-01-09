@@ -34,7 +34,7 @@
 			<version>1.2</version>
 		</dependency>
 
-		<!--##################### IOUtils #####################-->
+		<!--##################### COMMONS #####################-->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
@@ -47,8 +47,14 @@
 			<version>1.5</version>
 		</dependency>
 
-		<!--##################### Jakson JSON #####################-->
+		<!--Geracao de hash e encriptação de senha-->
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.15</version>
+		</dependency>
 
+		<!--##################### Jakson JSON #####################-->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>

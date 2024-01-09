@@ -7,15 +7,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import br.com.jdevtreinamentos.tf.infrastructure.connection.FabricaConexao;
 import br.com.jdevtreinamentos.tf.infrastructure.dao.service.EntidadeGenericaDAO;
 import br.com.jdevtreinamentos.tf.model.Funcionario;
-import br.com.jdevtreinamentos.tf.model.Telefone;
 import br.com.jdevtreinamentos.tf.model.enumeration.EnumSexo;
 import br.com.jdevtreinamentos.tf.model.enumeration.PerfilFuncionario;
 import br.com.jdevtreinamentos.tf.util.Calculador;
@@ -38,13 +35,10 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 
 	private Connection conexao;
 	private PreparedStatement stmt;
-	private DAOTelefone daoTelefone;
-
 	
-	//TODO - Excluir todo os telefones do funcionario
+
 	public DAOFuncionario() {
 		conexao = FabricaConexao.getConnection();
-		daoTelefone = new DAOTelefone();
 	}
 
 	@Override
@@ -74,11 +68,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 				boolean temProximo = resultado.next();
 
 				if (temProximo) {
-					
-					if(entidade.getTelefones().size() > 0) {
-						daoTelefone.salvar(entidade.getTelefones());
-					}
-					
+
 					optional = buscarPorId(resultado.getLong("id"));
 
 					entidade.setId(optional.get().getId());
@@ -107,10 +97,6 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 					salvarImagem(entidade);
 				}
 
-				if(entidade.getTelefones().size() > 0) {
-					daoTelefone.salvar(entidade.getTelefones());
-				}
-				
 				optional = buscarPorId(entidade.getId());
 			}
 
@@ -163,10 +149,33 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 				funcionario.setSalario(resultado.getDouble("salario"));
 				funcionario.setImagem(resultado.getString("imagem"));
 				funcionario.setLogin(resultado.getString("login"));
-				
-				Set<Telefone> telefones = new LinkedHashSet<>(daoTelefone.buscarTelefonesPorFuncionario(id));
-				
-				funcionario.setTelefones(telefones);
+
+				optional = Optional.of(funcionario);
+			}
+
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
+
+		return optional;
+	}
+
+	public Optional<Funcionario> buscarNomePorId(Long id) {
+
+		Optional<Funcionario> optional = Optional.empty();
+		try {
+			String sql = "SELECT f.id, f.nome FROM Funcionario f WHERE id = ?";
+			stmt = conexao.prepareStatement(sql);
+			stmt.setLong(1, id);
+
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
+
+			if (resultado.next()) {
+				Funcionario funcionario = new Funcionario();
+				funcionario.setId(resultado.getLong("id"));
+				funcionario.setNome(resultado.getString("nome"));
 
 				optional = Optional.of(funcionario);
 			}
@@ -216,6 +225,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 	public Pagination<Funcionario> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina) {
 		Pagination<Funcionario> pagination = new Pagination<>();
 
+		ResultSet resultado = null;
 		try {
 			int offset = (numeroPagina - 1) * registrosPorPagina;
 
@@ -224,7 +234,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 			stmt.setInt(1, registrosPorPagina);
 			stmt.setInt(2, offset);
 
-			ResultSet resultado = stmt.executeQuery();
+			resultado = stmt.executeQuery();
 			FabricaConexao.connectionCommit();
 
 			List<Funcionario> funcionarios = new ArrayList<>();
@@ -251,6 +261,17 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 		} catch (SQLException e) {
 			FabricaConexao.connectionRollback();
 			e.printStackTrace();
+			
+		} finally {
+			try {
+				if (resultado != null) {
+					resultado.close();
+				}
+
+				stmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		return pagination;
@@ -311,6 +332,8 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 			stmt = conexao.prepareStatement(sql);
 			stmt.setLong(1, id);
 
+			new DAOTelefone().excluirTodosTelefonesDoFuncionario(id);
+			
 			stmt.execute();
 			FabricaConexao.connectionCommit();
 
@@ -359,7 +382,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 
 		return total;
 	}
-	
+
 	@Override
 	public boolean registroExiste(Long id) {
 		boolean existe = false;

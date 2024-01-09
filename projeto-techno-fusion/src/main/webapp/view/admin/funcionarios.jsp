@@ -14,13 +14,12 @@ String valorPesquisa = (String) request.getAttribute("valorPesquisa");
 
 String urlLink = "";
 
-if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
+if (valorPesquisa != null && !valorPesquisa.trim().isEmpty()) {
 	urlLink = request.getContextPath() + "/funcionario/pesquisar?valor=" + valorPesquisa + "&page=";
 
-}else{
+} else {
 	urlLink = request.getContextPath() + "/funcionario?page=";
 }
-
 %>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -61,11 +60,9 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 					<ol
 						class="breadcrumb bg-transparent mb-1 pb-0 pt-1 px-0 me-sm-6 me-5">
 						<li class="breadcrumb-item text-sm"><a
-							class="opacity-5 text-dark" href="javascript:;">inicio</a></li>
-						<li class="breadcrumb-item text-sm text-dark active"
-							aria-current="page">inicio</li>
+							class="opacity-5 text-dark" href="javascript:;">Funcionários</a></li>
+
 					</ol>
-					<h6 class="font-weight-bold mb-0">Inicio</h6>
 				</nav>
 				<div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4"
 					id="navbar">
@@ -78,7 +75,7 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
                     <path stroke-linecap="round" stroke-linejoin="round"
 										d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                   </svg>
-							</span> <input type="text" class="form-control ps-0" 
+							</span> <input type="text" class="form-control ps-0"
 								placeholder="Search">
 						</div>
 					</div>
@@ -195,8 +192,8 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 						</li>
 						<li class="nav-item ps-2 d-flex align-items-center"><a
 							href="javascript:;" class="nav-link text-body p-0"> <img
-								src="<%=contexto%>assets/img/usuario.png" class="avatar avatar-sm"
-								alt="avatar" />
+								src="<%=contexto%>assets/img/usuario.png"
+								class="avatar avatar-sm" alt="avatar" />
 						</a></li>
 					</ul>
 				</div>
@@ -242,114 +239,106 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 								</div>
 							</div>
 							<div class="card-body px-0 py-0">
-								<form action="<%=request.getContextPath() + "/funcionario/pesquisar"%>" id="formPesquisa">
-									
-								<div class="input-group px-3 py-2">
-									<span class="btn btn-sm btn-dark btn-icon d-flex align-items-center mb-0" onclick="enviarFormPesquisa()">
-								<svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" fill="#FFF" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    			<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
+								<form
+									action="<%=request.getContextPath() + "/funcionario/pesquisar"%>"
+									id="formPesquisa">
+
+									<div class="input-group px-3 py-2">
+										<span
+											class="btn btn-sm btn-dark btn-icon d-flex align-items-center mb-0"
+											onclick="enviarFormPesquisa()"> <svg
+												xmlns="http://www.w3.org/2000/svg" width="16px"
+												height="16px" fill="#FFF" viewBox="0 0 24 24"
+												stroke-width="1.5" stroke="currentColor">
+                    			<path stroke-linecap="round"
+													stroke-linejoin="round"
+													d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
                   				</svg>
-							</span> <input type="text" class="form-control px-2" placeholder="Search" value="${valorPesquisa}" name="valor">
-									
-									<a href = "<%=request.getContextPath() + "/funcionario"%>">
-									<span class="input-group-text btn-dark btn-inner--text border-end-0 " style="background-color: #D10024;">
-								Limpar
-                  				
-							</span>
-											</a>
-								</div>
-									<%-- <div class="border-bottom py-2 px-3 d-sm-flex align-items-center">
-											<button type="button" onclick="enviarFormPesquisa()" class="input-group-text text-body"> 
-												<svg
-													xmlns="http://www.w3.org/2000/svg" width="16px"
-													height="16px" fill="none" viewBox="0 0 24 24"
-													stroke-width="1.5" stroke="currentColor">
-											<path stroke-linecap="round" stroke-linejoin="round"
-														d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
-											</svg>
-											<span class="font-weight-bold mb-0">Pesquisar</span>
-											</button></a> 
-											<input type="text" class="form-control" placeholder="Search" value="${valorPesquisa}" name="valor">
+										</span> <input type="text" class="form-control px-2"
+											placeholder="Search" value="${valorPesquisa}" name="valor">
 
-											<a href = "<%=request.getContextPath() + "/funcionario"%>">
-												<button type="button" class="input-group-text text-body"> 
-
-												<span class="font-weight-bold mb-0">Cancelar</span>
-												</button>
-											</a>
-									</div> --%>
+										<a href="<%=request.getContextPath() + "/funcionario"%>">
+											<span
+											class="input-group-text btn-dark btn-inner--text border-end-0 "
+											style="background-color: #D10024;"> Limpar </span>
+										</a>
+									</div>
 								</form>
 
-									<c:choose>
-										<c:when test="${not empty pagination.content}">
+								<c:choose>
+									<c:when test="${not empty pagination.content}">
 										<div class="table-responsive p-0">
-											<table class="table table-sm table-striped align-items-center mb-0">
-											<thead class="bg-gray-100">
-											<tr>
-												<th
-													class="text-secondary text-xs font-weight-semibold opacity-7">Nome</th>
-												<th
-													class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">Sexo</th>
-												<th
-													class="text-center text-secondary text-xs font-weight-semibold opacity-7">Perfil</th>
-												<th
-													class="text-center text-secondary text-xs font-weight-semibold opacity-7">Salário</th>
-												<th class="text-secondary opacity-7 text-xs font-weight-semibold opacity-7">Ações</th>
-											</tr>
-										</thead>
-										<tbody>
-											<c:forEach items="${pagination.content}" var="f">
-												<tr>
-													<td>
-														<div class="d-flex px-2 py-1">
-															<div
-																class="d-flex flex-column justify-content-center ms-1">
-																<h6 class="mb-0 text-sm font-weight-semibold">${f.nome}</h6>
-																<p class="text-sm text-secondary mb-0">${f.email}</p>
-															</div>
-														</div>
-													</td>
-													<td><span
-														class="text-secondary text-sm font-weight-normal">${f.sexo.descricao}</span>
-													</td>
-													<td class="align-middle text-center text-sm">
-														<p class="text-sm text-dark font-weight-semibold mb-0">${f.perfil.descricao}</p>
+											<table
+												class="table table-sm table-striped align-items-center mb-0">
+												<thead class="bg-gray-100">
+													<tr>
+														<th
+															class="text-secondary text-xs font-weight-semibold opacity-7">Nome</th>
+														<th
+															class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">Sexo</th>
+														<th
+															class="text-center text-secondary text-xs font-weight-semibold opacity-7">Perfil</th>
+														<th
+															class="text-center text-secondary text-xs font-weight-semibold opacity-7">Salário</th>
+														<th
+															class="text-secondary opacity-7 text-xs font-weight-semibold opacity-7">Ações</th>
+													</tr>
+												</thead>
+												<tbody>
+													<c:forEach items="${pagination.content}" var="f">
+														<tr>
+															<td>
+																<div class="d-flex px-2 py-1">
+																	<div
+																		class="d-flex flex-column justify-content-center ms-1">
+																		<h6 class="mb-0 text-sm font-weight-semibold">${f.nome}</h6>
+																		<p class="text-sm text-secondary mb-0">${f.email}</p>
+																	</div>
+																</div>
+															</td>
+															<td><span
+																class="text-secondary text-sm font-weight-normal">${f.sexo.descricao}</span>
+															</td>
+															<td class="align-middle text-center text-sm">
+																<p class="text-sm text-dark font-weight-semibold mb-0">${f.perfil.descricao}</p>
 
-													</td>
-													<td class="align-middle text-center"><span
-														class="badge badge-sm border border-success text-sm font-weight-semibold mb-0 text-success bg-success">R$
-															${f.salario}</span></td>
-													<td class="align-middle">
-													
-													<img onclick="editar(this)" id="${f.id}" src="<%=contexto%>assets/img/editar.png" class="px-3"
-														data-bs-toggle="tooltip"
-														data-bs-title="Editar funcionário"> 
-													
-													<img onclick="excluir(${f.id})" src="<%=contexto%>assets/img/excluir.png" class="px-3" data-bs-toggle="tooltip"
-														data-bs-title="Excluir funcionário">
-													
-													</td>
-												</tr>
-											</c:forEach>
+															</td>
+															<td class="align-middle text-center"><span
+																class="badge badge-sm border border-success text-sm font-weight-semibold mb-0 text-success bg-success">R$
+																	${f.salario}</span></td>
+															<td class="align-middle"><img onclick="editar(this)"
+																id="${f.id}" src="<%=contexto%>assets/img/editar.png"
+																class="px-3" data-bs-toggle="tooltip"
+																data-bs-title="Editar funcionário"> <img
+																onclick="excluir(${f.id})"
+																src="<%=contexto%>assets/img/excluir.png" class="px-3"
+																data-bs-toggle="tooltip"
+																data-bs-title="Excluir funcionário"></td>
+														</tr>
+													</c:forEach>
 
-										</tbody>
-									</table>
-								</div>
-										</c:when>
-										<c:otherwise>
-											<div class="px-3 py-2">
-												<p class="mb-0">Nenhum registro encontrado!</p>
-                                        	</div>
-										</c:otherwise>
-									</c:choose>
-									
+												</tbody>
+											</table>
+										</div>
+									</c:when>
+									<c:otherwise>
+										<tr>
+											<td colspan="3">
+												<div class="px-3 py-2" >
+													<p class="mb-0">Nenhum registro encontrado!</p>
+												</div>
+											</td>
+										</tr>
+									</c:otherwise>
+								</c:choose>
+
 								<div class="row align-items-center border-top py-3 px-3">
 
 									<div class="col-md-3">
-									<p class="font-weight-semibold mb-3 text-dark text-sm">Página
-										${pagination.pageable.pageNumber} de ${pagination.totalPages}</p>
+										<p class="font-weight-semibold mb-3 text-dark text-sm">Página
+											${pagination.pageable.pageNumber} de ${pagination.totalPages}</p>
 
-									</div>	
+									</div>
 
 									<div class="col-md-9">
 										<nav>
@@ -372,14 +361,12 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 													<c:choose>
 														<c:when test="${i eq pagination.pageable.pageNumber}">
 															<li class="page-item active"><a
-																class="btn btn-white mb-0 page-link">${i}</a>
-															</li>
+																class="btn btn-white mb-0 page-link">${i}</a></li>
 														</c:when>
 														<c:otherwise>
 															<li class="page-item"><a
 																class="btn btn-white mb-0 page-link"
-																href="<%=urlLink%>${i}">${i}</a>
-															</li>
+																href="<%=urlLink%>${i}">${i}</a></li>
 														</c:otherwise>
 													</c:choose>
 
@@ -421,20 +408,13 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 							</div>
 
 							<div class="mt-2 px-3">
-								<form enctype="multipart/form-data" onsubmit="false"
+								<form enctype="multipart/form-data"
 									action="<%=request.getContextPath() + "/funcionario"%>"
 									method="post" id="formFuncionario">
 
-									<input type="hidden" value="${operacaoErro}"
-										id="operacaoErro"> <input type="hidden"
-										value="${resposta.artefato.imagem}" id="imagemArmazenada"
-										name="imagemArmazenada">
-
-									<input type="hidden"
-										value="${telefonesJson}" id="telefones"
-										name="telefones">
-
-									<input type="hidden" id="telefoneTemp">
+									<input type="hidden" value="${operacaoErro}" id="operacaoErro">
+									<input type="hidden" value="${resposta.artefato.imagem}"
+										id="imagemArmazenada" name="imagemArmazenada">
 
 									<div class="form-group">
 										<label for="id" class="form-control-label">Id</label> <input
@@ -447,12 +427,13 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 											value="${resposta.artefato.nome}" id="nome" name="nome">
 									</div>
 
-									<div class="form-group">
+									<div class="form-group d-flex flex-column" id="groupPreviewImagem">
 										<c:choose>
 											<c:when test="${not empty resposta.artefato.imagem}">
 												<img src="" class="rounded" alt="Imagem funcionário"
 													style="width: 200px; height: 200px; object-fit: cover;"
 													id="box-img">
+													
 											</c:when>
 
 											<c:otherwise>
@@ -466,7 +447,7 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 									<div class="form-group">
 										<label for="imagem" class="form-control-label">Imagem</label>
 										<input class="form-control" type="file" accept="image/*"
-											value="${resposta.artefato.imagem}" id="input-imagem" 
+											value="${resposta.artefato.imagem}" id="input-imagem"
 											name="imagem" onchange="previewImage()">
 									</div>
 
@@ -572,71 +553,6 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 											id="senha">
 									</div>
 
-									<h6 class="font-weight-semibold text-lg mb-0 mt-2">Telefones</h6>
-									<hr>
-
-									<div class="form-group">
-									<label for="inputTelefone" class="form-control-label">Telefone</label>
-
-									<div class="input-group">
-									<span class="btn btn-sm btn-dark btn-icon d-flex align-items-center mb-0" onclick="adicionarTelefone()">Save</span> 
-									
-									<input class="form-control" type="text"
-											value=""
-											id="inputTelefone" onkeyup="formatarTelefone(event)">
-									
-									<span class="input-group-text btn-dark btn-inner--text border-end-0 " style="background-color: #D10024;" onclick="limparInputTelefone()">
-								Limpar
-                  				
-							</span>
-								</div>
-								</div>
-
-									<div class="table-responsive p-0">
-											<table class="table table-sm table-striped align-items-center mb-0" id="tabelaTelefones">
-											<thead class="bg-gray-100">
-											<tr>
-												<th
-													class="text-secondary text-xs font-weight-semibold opacity-7">Telefone</th>
-												<th
-													class="text-secondary text-xs font-weight-semibold opacity-7">Número</th>
-												<th class="text-secondary opacity-7 text-xs font-weight-semibold opacity-7">Ações</th>
-											</tr>
-										</thead>
-										<tbody>
-										 <%!int number = 1;%>
-											<c:forEach items="${}" var="f">
-												<tr>
-													<td>
-														<div class="d-flex px-2 py-1">
-															<h6 class="mb-0 text-sm font-weight-semibold"><%=number ++%></h6>
-														</div>
-													</td>
-													<td>
-														<div class="d-flex px-2 py-1">
-															<div
-																class="d-flex flex-column justify-content-center ms-1">
-																<h6 class="mb-0 text-sm font-weight-semibold">${f.nome}</h6>
-															</div>
-														</div>
-													</td>
-													<td class="align-middle">
-													
-													<img onclick="editarTelfone()" src="<%=contexto%>assets/img/editar.png" class="px-3"
-														data-bs-toggle="tooltip"
-														data-bs-title="Editar telefone"> 
-													
-													<img onclick="excluirTelefone()" src="<%=contexto%>assets/img/excluir.png" class="px-3" data-bs-toggle="tooltip"
-														data-bs-title="Excluir telefone">
-													
-													</td>
-												</tr>
-											</c:forEach>
-
-										</tbody>
-									</table>
-								</div>
-
 									<div class="card-body px-0 py-2">
 										<div class="ms-auto d-flex align-items-center"
 											id="btn-acoes-form">
@@ -645,6 +561,18 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 
 											<button type="button" class="btn btn-info me-2"
 												onclick="restaurarTab()">Novo funcionário</button>
+												
+											<span class="d-inline-block" tabindex="0"
+												data-bs-toggle="popover" data-bs-trigger="hover focus"
+												 data-bs-custom-class="custom-popover"
+												 data-bs-placement="top"
+        										data-bs-title="Informação"
+												data-bs-content="Cadastre o funcionário para adicionar telefones" id="popoverTelefone">
+												<button type="button" class="btn btn-warning me-2"
+													onclick="getPaginaTelefones()" disabled="disabled"
+													id="btnTelefones">Telefones</button>
+											</span>
+
 										</div>
 									</div>
 
@@ -670,7 +598,7 @@ if(valorPesquisa != null && !valorPesquisa.trim().isEmpty()){
 							<script>
 								document.write(new Date().getFullYear())
 							</script>
-							
+
 						</div>
 					</div>
 				</div>

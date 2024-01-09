@@ -1,5 +1,7 @@
 package br.com.jdevtreinamentos.tf.util;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import br.com.jdevtreinamentos.tf.model.Funcionario;
 
 /**
@@ -7,14 +9,14 @@ import br.com.jdevtreinamentos.tf.model.Funcionario;
  * 
  * @author Erik Vasconcelos
  * @since 2023-12-28
- * @version 0.1 2023-12-20
+ * @version 0.2 2023-12-20
  */
 
 public class GeradorSenha {
 
-	public static String gerar(Funcionario funcionario) {
+	public static String gerarSenhaPadrão(Funcionario funcionario) {
 		if (verificarRequisitios(funcionario)) {
-			String senha = funcionario.getEmail() + funcionario.getLogin();
+			String senha = DigestUtils.sha1Hex(funcionario.getEmail() + funcionario.getLogin());
 
 			return senha;
 		}

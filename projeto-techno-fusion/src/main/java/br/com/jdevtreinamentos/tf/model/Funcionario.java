@@ -37,11 +37,6 @@ public class Funcionario {
 	private String senha;
 	private Set<Telefone> telefones = new LinkedHashSet<>();
 
-	public void setTelefones(Set<Telefone> telefones) {
-		telefones.forEach(t -> t.setFuncionario(this));
-		this.telefones = telefones;
-	}
-
 	@JsonIgnore
 	public boolean isNovo() {
 		if (id == null || id.equals(0L)) {
