@@ -9,11 +9,15 @@ import br.com.jdevtreinamentos.tf.model.Funcionario;
  * 
  * @author Erik Vasconcelos
  * @since 2023-12-28
- * @version 0.2 2023-12-20
+ * @version 0.3 2024-01-10
  */
 
 public class GeradorSenha {
 
+	public static String enciptarSenha(String senha) {
+		return DigestUtils.sha1Hex(senha);
+	}
+	
 	public static String gerarSenhaPadrão(Funcionario funcionario) {
 		if (verificarRequisitios(funcionario)) {
 			String senha = DigestUtils.sha1Hex(funcionario.getEmail() + funcionario.getLogin());

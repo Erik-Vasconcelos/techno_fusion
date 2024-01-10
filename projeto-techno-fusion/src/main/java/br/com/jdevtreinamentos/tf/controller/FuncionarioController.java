@@ -14,6 +14,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
@@ -45,8 +46,8 @@ import br.com.jdevtreinamentos.tf.util.Pagination;
  */
 
 @MultipartConfig
-@WebServlet(urlPatterns = { "/funcionario", "/funcionario/editar", "/funcionario/excluir", "/funcionario/pesquisar",
-		"/funcionario/downloadImagem" })
+@WebServlet(name = "funcionarioController", urlPatterns = { "/funcionario", "/funcionario/editar",
+		"/funcionario/excluir", "/funcionario/pesquisar", "/funcionario/downloadImagem" })
 public class FuncionarioController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -66,11 +67,22 @@ public class FuncionarioController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		// Atualiza a sessao sempre que o usuário interage com a servlet, evitando
+		// assim, que a sessao expire quando ele estiver usando a aplicação
+		
+//		SessaoUtil.atualizarSessao(request);
+
 		// FIXME - Mostrar excecao de usuario sem imagem no download
 
 		try {
 			if (request.getServletPath().endsWith("editar")) {
-				editar(request, response);
+				HttpSession session = request.getSession(false);
+				
+				if (session == null || session.isNew()) {
+					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+				} else {
+					editar(request, response);
+				}
 
 			} else if (request.getServletPath().endsWith("excluir")) {
 				excluir(request, response);
@@ -146,7 +158,7 @@ public class FuncionarioController extends HttpServlet {
 
 			if (funcionario.isNovo()) {
 				String senhaGerada = GeradorSenha.gerarSenhaPadrão(funcionario);
-				
+
 				funcionario.setSenha(senhaGerada);
 
 				daoFuncionario.salvar(funcionario);
@@ -278,13 +290,13 @@ public class FuncionarioController extends HttpServlet {
 					response.setHeader("Content-Disposition",
 							"attachment;filename=" + primeiroNome + "." + extensaoImagem);
 					// Define o por quanto tempo o browser pode armazenar em cache a imagem
-					//response.setHeader("Cache-Control", "public, max-age=3600");
+					// response.setHeader("Cache-Control", "public, max-age=3600");
 					// Define a data de imagem quando a imagem em cache vai expirar
-					//response.setDateHeader("Expires", System.currentTimeMillis() + 3600 * 1000);
+					// response.setDateHeader("Expires", System.currentTimeMillis() + 3600 * 1000);
 
 					// Codigo/identificador etag para a entidade imagem
-					//String etag = DigestUtils.sha256Hex(primeiroNome + extensaoImagem);
-					//response.setHeader("ETag", etag);
+					// String etag = DigestUtils.sha256Hex(primeiroNome + extensaoImagem);
+					// response.setHeader("ETag", etag);
 
 					response.getOutputStream().write(new Base64().decode(imagemBase64));
 				} else {

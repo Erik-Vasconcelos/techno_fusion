@@ -1,6 +1,7 @@
 /*################### Adicionado eventos antes de carregar #######################*/
 
 document.addEventListener('DOMContentLoaded', function () {
+	ativarBtnPaginaAtual();
 	$("#preloader").show();
 	formatarNumerosTelefoneNaTabela();
 	$("#preloader").hide();
@@ -112,3 +113,5 @@ function removerFormatacaoTelefone(value) {
 
 	return value;
 }
+
+function ativarBtnPaginaAtual(){$('ul-menu > li > a').removeClass('active'); $('#btnPaginaFuncinarios').addClass('active');}

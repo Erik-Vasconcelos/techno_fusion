@@ -32,7 +32,7 @@ import br.com.jdevtreinamentos.tf.util.Pagination;
  * @version 0.1 2024-01-08
  */
 
-@WebServlet(urlPatterns = { "/funcionario/telefone", "/funcionario/telefone/editar", "/funcionario/telefone/excluir" })
+@WebServlet(name = "telefoneController", urlPatterns = { "/funcionario/telefone", "/funcionario/telefone/editar", "/funcionario/telefone/excluir" })
 public class TelefoneController extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;

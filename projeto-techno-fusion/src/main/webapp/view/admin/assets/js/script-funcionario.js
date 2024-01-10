@@ -12,6 +12,8 @@ triggerTabList.forEach(triggerEl => {
 
 //Verifica se houve algum erro, em caso afirmativo muda para a tela de cadastro/atualização 
 document.addEventListener('DOMContentLoaded', function() {
+	ativarBtnPaginaAtual();
+	
 	$("#preloader").show();
 
 	var operacaoErro = $('#operacaoErro').val();
@@ -175,6 +177,14 @@ function editar(e) {
 
 	}).fail(function(xhr, status, errorThrown) {
 		$("#preloader").hide();
+		
+		if(xhr.status === 401){
+			let url = $('#formFuncionario').attr('action');
+			url = url.replace("funcionario", "login");
+			
+			window.location.href = url;
+		}
+		
 		var boxMessage = document.getElementById("modalBody");
 
 		if (xhr.responseText != null && xhr.responseText != '') {
@@ -311,3 +321,5 @@ function removerParamUrl() {
 
 	window.history.replaceState({}, document.title, url.href);
 }
+
+function ativarBtnPaginaAtual(){$('ul-menu > li > a').removeClass('active'); $('#btnPaginaFuncinarios').addClass('active');}
