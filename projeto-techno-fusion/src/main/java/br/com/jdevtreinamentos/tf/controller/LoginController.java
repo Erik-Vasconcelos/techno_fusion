@@ -16,6 +16,7 @@ import br.com.jdevtreinamentos.tf.controller.infra.StatusResposta;
 import br.com.jdevtreinamentos.tf.exception.DadosInvalidosException;
 import br.com.jdevtreinamentos.tf.infrastructure.dao.impl.DAOFuncionario;
 import br.com.jdevtreinamentos.tf.model.Funcionario;
+import br.com.jdevtreinamentos.tf.util.GeradorSenha;
 
 /**
  * Classe responsável por receber e processar as requisições para os recursos
@@ -65,8 +66,7 @@ public class LoginController extends HttpServlet {
 
 			funcionario = new Funcionario();
 			funcionario.setLogin(login);
-			// funcionario.setSenha(GeradorSenha.enciptarSenha(senha));
-			funcionario.setSenha(senha);
+			funcionario.setSenha(GeradorSenha.encriptarSenha(senha));
 
 			Optional<Funcionario> optional = daoFuncionario.autenticarFuncionario(funcionario);
 

@@ -122,7 +122,7 @@ if (valorPesquisa != null && !valorPesquisa.trim().isEmpty()) {
 							<ul class="dropdown-menu  dropdown-menu-end  px-2 py-3 me-sm-n4"
 								aria-labelledby="dropdownMenuButton">
 								<li class="mb-2"><a class="dropdown-item border-radius-md"
-									href="javascript:;">
+									href="<%=request.getContextPath()%>/funcionario/perfil">
 										<div class="d-flex py-1">
 											<div class="my-auto">
 												<img src="<%=contexto%>assets/img/usuario.png"
@@ -150,6 +150,7 @@ if (valorPesquisa != null && !valorPesquisa.trim().isEmpty()) {
 										</div>
 								</a></li>
 							</ul>
+							</li>
 					</ul>
 				</div>
 			</div>

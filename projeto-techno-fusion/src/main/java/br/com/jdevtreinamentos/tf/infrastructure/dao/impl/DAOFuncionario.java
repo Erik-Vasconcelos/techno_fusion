@@ -35,7 +35,6 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 
 	private Connection conexao;
 	private PreparedStatement stmt;
-	
 
 	public DAOFuncionario() {
 		conexao = FabricaConexao.getConnection();
@@ -124,6 +123,22 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 		}
 	}
 
+	public void atualizarSenha(Funcionario entidade) {
+		try {
+			String sql = "UPDATE funcionario SET senha=? WHERE id=?";
+			stmt = conexao.prepareStatement(sql);
+			stmt.setString(1, entidade.getSenha());
+			stmt.setLong(2, entidade.getId());
+
+			stmt.executeUpdate();
+			FabricaConexao.connectionCommit();
+			
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	public Optional<Funcionario> buscarPorId(Long id) {
 		// TODO - criar sistema de encapsulamento do objeto e das informacoes
@@ -187,41 +202,41 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 
 		return optional;
 	}
-	
+
 	public Optional<Funcionario> autenticarFuncionario(Funcionario funcionario) {
-        Optional<Funcionario> optional = Optional.empty();
+		Optional<Funcionario> optional = Optional.empty();
 
-        try {
-            String sql = "SELECT f.id, f.nome, f.sexo, f.data_nascimento, f.perfil, f.email, f.salario, f.imagem, f.login FROM funcionario f WHERE login = ? AND senha = ?";
-            stmt = conexao.prepareStatement(sql);
-            stmt.setString(1, funcionario.getLogin());
-            stmt.setString(2, funcionario.getSenha());
+		try {
+			String sql = "SELECT f.id, f.nome, f.sexo, f.data_nascimento, f.perfil, f.email, f.salario, f.imagem, f.login, f.senha FROM funcionario f WHERE login = ? AND senha = ?";
+			stmt = conexao.prepareStatement(sql);
+			stmt.setString(1, funcionario.getLogin());
+			stmt.setString(2, funcionario.getSenha());
 
-            ResultSet resultado = stmt.executeQuery();
-            FabricaConexao.connectionCommit();
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
 
-            if (resultado.next()) {
-                Funcionario funcionarioAutenticado = new Funcionario();
-                funcionarioAutenticado.setId(resultado.getLong("id"));
-                funcionarioAutenticado.setNome(resultado.getString("nome"));
-                funcionarioAutenticado.setSexo(EnumSexo.toEnumBySigla(resultado.getString("sexo")));
-                funcionarioAutenticado.setDataNascimento(resultado.getDate("data_nascimento").toLocalDate());
-                funcionarioAutenticado.setPerfil(PerfilFuncionario.toEnum(resultado.getString("perfil")));
-                funcionarioAutenticado.setEmail(resultado.getString("email"));
-                funcionarioAutenticado.setSalario(resultado.getDouble("salario"));
-                funcionarioAutenticado.setImagem(resultado.getString("imagem"));
-                funcionarioAutenticado.setLogin(resultado.getString("login"));
+			if (resultado.next()) {
+				Funcionario funcionarioAutenticado = new Funcionario();
+				funcionarioAutenticado.setId(resultado.getLong("id"));
+				funcionarioAutenticado.setNome(resultado.getString("nome"));
+				funcionarioAutenticado.setSexo(EnumSexo.toEnumBySigla(resultado.getString("sexo")));
+				funcionarioAutenticado.setDataNascimento(resultado.getDate("data_nascimento").toLocalDate());
+				funcionarioAutenticado.setPerfil(PerfilFuncionario.toEnum(resultado.getString("perfil")));
+				funcionarioAutenticado.setEmail(resultado.getString("email"));
+				funcionarioAutenticado.setSalario(resultado.getDouble("salario"));
+				funcionarioAutenticado.setImagem(resultado.getString("imagem"));
+				funcionarioAutenticado.setLogin(resultado.getString("login"));
 
-                optional = Optional.of(funcionarioAutenticado);
-            }
+				optional = Optional.of(funcionarioAutenticado);
+			}
 
-        } catch (SQLException e) {
-            FabricaConexao.connectionRollback();
-            e.printStackTrace();
-        }
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
 
-        return optional;
-    }
+		return optional;
+	}
 
 	@Override
 	public List<Funcionario> obterTodos() {
@@ -296,7 +311,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 		} catch (SQLException e) {
 			FabricaConexao.connectionRollback();
 			e.printStackTrace();
-			
+
 		} finally {
 			try {
 				if (resultado != null) {
@@ -368,7 +383,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 			stmt.setLong(1, id);
 
 			new DAOTelefone().excluirTodosTelefonesDoFuncionario(id);
-			
+
 			stmt.execute();
 			FabricaConexao.connectionCommit();
 

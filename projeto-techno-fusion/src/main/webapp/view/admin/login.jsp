@@ -98,16 +98,7 @@ String contexto = request.getContextPath() + "/view/admin/";
 												placeholder="Digite sua senha" aria-label="Senha"
 												aria-describedby="password-addon" name="senha" id="senha">
 										</div>
-										<div class="d-flex align-items-center">
-											<div class="form-check form-check-info text-left mb-0">
-												<input class="form-check-input" type="checkbox" value=""
-													id="flexCheckDefault"> <label
-													class="font-weight-normal text-dark mb-0"
-													for="flexCheckDefault"> Remember for 14 days </label>
-											</div>
-											<a href="javascript:;"
-												class="text-xs font-weight-bold ms-auto">Forgot password</a>
-										</div>
+										
 										<div class="text-center">
 											<input type="submit" value="Entrar"
 												class="btn btn-dark w-100 mt-4 mb-3">

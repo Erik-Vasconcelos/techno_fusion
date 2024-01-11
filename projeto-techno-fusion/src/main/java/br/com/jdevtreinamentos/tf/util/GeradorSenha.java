@@ -14,10 +14,10 @@ import br.com.jdevtreinamentos.tf.model.Funcionario;
 
 public class GeradorSenha {
 
-	public static String enciptarSenha(String senha) {
+	public static String encriptarSenha(String senha) {
 		return DigestUtils.sha1Hex(senha);
 	}
-	
+
 	public static String gerarSenhaPadrão(Funcionario funcionario) {
 		if (verificarRequisitios(funcionario)) {
 			String senha = DigestUtils.sha1Hex(funcionario.getEmail() + funcionario.getLogin());

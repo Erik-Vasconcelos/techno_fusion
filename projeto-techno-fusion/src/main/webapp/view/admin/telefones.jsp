@@ -101,25 +101,23 @@ String contexto = request.getContextPath() + "/view/admin/";
 							<li class="nav-item dropdown pe-2 d-flex align-items-center px-1">
 							<a href="javascript:;" class="nav-link text-body p-0"
 							id="dropdownMenuButton" data-bs-toggle="dropdown"
-							aria-expanded="false"> 
-							<c:choose>
-							<c:when test="${not empty usuario.imagem}">
-								<img
-										src="${usuario.imagem}" class="avatar avatar-sm" alt="avatar" />
-							</c:when>
+							aria-expanded="false"> <c:choose>
+									<c:when test="${not empty usuario.imagem}">
+										<img src="${usuario.imagem}" class="avatar avatar-sm"
+											alt="avatar" />
+									</c:when>
 
-							<c:otherwise>
-									<img
-										src="<%=contexto%>assets/img/usuario.png"
-										class="avatar avatar-sm" alt="avatar" />
-								
-							</c:otherwise>
-						</c:choose>
+									<c:otherwise>
+										<img src="<%=contexto%>assets/img/usuario.png"
+											class="avatar avatar-sm" alt="avatar" />
+
+									</c:otherwise>
+								</c:choose>
 						</a>
 							<ul class="dropdown-menu  dropdown-menu-end  px-2 py-3 me-sm-n4"
 								aria-labelledby="dropdownMenuButton">
 								<li class="mb-2"><a class="dropdown-item border-radius-md"
-									href="javascript:;">
+									href="<%=request.getContextPath()%>/funcionario/perfil">
 										<div class="d-flex py-1">
 											<div class="my-auto">
 												<img src="<%=contexto%>assets/img/usuario.png"
@@ -141,11 +139,13 @@ String contexto = request.getContextPath() + "/view/admin/";
 											</div>
 											<div class="d-flex flex-column justify-content-center">
 												<h6 class="text-sm font-weight-normal mb-1">
-													<span class="font-weight-bold">Sair</span> 
+													<span class="font-weight-bold">Sair</span>
 												</h6>
 											</div>
 										</div>
 								</a></li>
+							</ul>
+						</li>
 					</ul>
 				</div>
 			</div>
