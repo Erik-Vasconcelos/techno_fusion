@@ -50,7 +50,7 @@
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="marcas.jsp">
+          <a class="nav-link" href="<%=contexto%>/marca" id="btnPaginaMarcas">
             <div class="icon icon-shape icon-sm px-0 text-center d-flex align-items-center justify-content-center">
               <img src="<%=contexto%>/view/admin/assets/img/produto.png" alt="produto" width="24">
             </div>

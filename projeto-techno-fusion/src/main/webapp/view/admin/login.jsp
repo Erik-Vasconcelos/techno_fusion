@@ -86,15 +86,23 @@ String contexto = request.getContextPath() + "/view/admin/";
 									<form action="<%=request.getContextPath()%>/login"
 										method="POST" id="loginForm">
 
+								<!-- ############ REMOVER MODIFICACAO LOGIN ESTATICO ######################## -->
 										<label>Login</label>
 										<div class="mb-3">
-											<input type="text" class="form-control" required="required"
+											<!--<input type="text" class="form-control" required="required"
+												placeholder="Digite seu login" aria-label="login"
+												aria-describedby="login-campo" name="login" id="login">-->
+												
+											<input type="text" class="form-control"
 												placeholder="Digite seu login" aria-label="login"
 												aria-describedby="login-campo" name="login" id="login">
 										</div>
 										<label>Senha</label>
 										<div class="mb-3">
-											<input type="password" class="form-control" required="required"
+											<!--<input type="password" class="form-control" required="required"
+												placeholder="Digite sua senha" aria-label="Senha"
+												aria-describedby="password-addon" name="senha" id="senha">-->
+											<input type="password" class="form-control" 
 												placeholder="Digite sua senha" aria-label="Senha"
 												aria-describedby="password-addon" name="senha" id="senha">
 										</div>

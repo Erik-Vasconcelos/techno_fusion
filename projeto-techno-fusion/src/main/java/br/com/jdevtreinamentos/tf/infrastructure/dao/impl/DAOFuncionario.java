@@ -327,7 +327,6 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 		return pagination;
 	}
 
-	@Override
 	public Pagination<Funcionario> obterRegistrosPaginadosPreviewPorNome(String parteNome, Integer numeroPagina,
 			Integer registrosPorPagina) {
 		Pagination<Funcionario> pagination = new Pagination<>();

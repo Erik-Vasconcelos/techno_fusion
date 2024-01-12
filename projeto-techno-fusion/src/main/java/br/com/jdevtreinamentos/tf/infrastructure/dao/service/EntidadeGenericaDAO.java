@@ -24,9 +24,6 @@ public interface EntidadeGenericaDAO<T> {
 
 	public Pagination<T> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina);
 
-	public Pagination<T> obterRegistrosPaginadosPreviewPorNome(String parteNome, Integer numeroPagina,
-			Integer registrosPorPagina);
-
 	public boolean excluirPorId(Long id);
 
 	public int obterTotalRegistros();

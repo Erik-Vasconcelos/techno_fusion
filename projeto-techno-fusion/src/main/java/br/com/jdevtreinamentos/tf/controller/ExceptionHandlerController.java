@@ -51,7 +51,7 @@ public class ExceptionHandlerController extends HttpServlet {
 			statusCode = HttpServletResponse.SC_FORBIDDEN;
 
 		} else if (statusCode.equals(HttpServletResponse.SC_NOT_FOUND)) {
-			mensagem = "Recurso não encontrado! Você estaá solicitando um recurso que não existe.";
+			mensagem = "Recurso não encontrado! Você está solicitando um recurso que não existe.";
 			statusCode = HttpServletResponse.SC_NOT_FOUND;
 		} else {
 			mensagem = "Ocorreu um erro inesperado!";

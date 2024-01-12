@@ -31,7 +31,7 @@ import br.com.jdevtreinamentos.tf.model.enumeration.PerfilFuncionario;
  * @version 0.1 2024-01-10
  */
 
-@WebFilter(filterName = "filtroLogin", urlPatterns = { "/funcionario/*" })
+@WebFilter(filterName = "filtroLogin", urlPatterns = { "/funcionario/*", "/marca/*"})
 public class LoginFilter extends HttpFilter implements Filter {
 
 	private static final long serialVersionUID = 1L;
@@ -52,6 +52,8 @@ public class LoginFilter extends HttpFilter implements Filter {
 		HttpServletRequest requestHttp = (HttpServletRequest) request;
 		HttpServletResponse responseHttp = (HttpServletResponse) response;
 		HttpSession sessao = requestHttp.getSession(false);
+		
+		
 		try {
 			if (sessao == null) {
 				sessao = requestHttp.getSession();

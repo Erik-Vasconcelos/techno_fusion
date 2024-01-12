@@ -68,7 +68,13 @@ public class LoginController extends HttpServlet {
 			funcionario.setLogin(login);
 			funcionario.setSenha(GeradorSenha.encriptarSenha(senha));
 
-			Optional<Funcionario> optional = daoFuncionario.autenticarFuncionario(funcionario);
+//			Optional<Funcionario> optional = daoFuncionario.autenticarFuncionario(funcionario);
+			
+			//LOGIN estático
+			Funcionario funcionario1 = new Funcionario();
+			funcionario1.setLogin(656565 + "");
+			funcionario1.setSenha(GeradorSenha.encriptarSenha("img12345"));
+			Optional<Funcionario> optional = daoFuncionario.autenticarFuncionario(funcionario1);
 
 			if (optional.isPresent()) {
 				request.getSession().setAttribute("usuario", optional.get());

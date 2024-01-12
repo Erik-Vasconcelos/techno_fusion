@@ -46,7 +46,7 @@ public class DAOTelefone implements Serializable, EntidadeGenericaDAO<Telefone> 
 	public Telefone salvar(Telefone entidade) {
 		Optional<Telefone> optional = Optional.empty();
 		try {
-			
+
 			String sql = "";
 			if (entidade.isNovo()) {
 				sql = "INSERT INTO telefone(numero, funcionario_id) VALUES(?, ?)";
@@ -84,19 +84,17 @@ public class DAOTelefone implements Serializable, EntidadeGenericaDAO<Telefone> 
 
 		return optional.orElse(new Telefone());
 	}
-	
+
 	public Set<Telefone> salvar(Set<Telefone> telefones) {
-	    Set<Telefone> telefonesSalvos = new HashSet<>();
+		Set<Telefone> telefonesSalvos = new HashSet<>();
 
-	    for (Telefone telefone : telefones) {
-	        Telefone telefoneSalvo = salvar(telefone);
-	        telefonesSalvos.add(telefoneSalvo);
-	    }
+		for (Telefone telefone : telefones) {
+			Telefone telefoneSalvo = salvar(telefone);
+			telefonesSalvos.add(telefoneSalvo);
+		}
 
-	    return telefonesSalvos;
+		return telefonesSalvos;
 	}
-	
-
 
 	@Override
 	public Optional<Telefone> buscarPorId(Long id) {
@@ -180,7 +178,7 @@ public class DAOTelefone implements Serializable, EntidadeGenericaDAO<Telefone> 
 			return false;
 		}
 	}
-	
+
 	public boolean excluirTodosTelefonesDoFuncionario(Long idFuncionario) {
 		try {
 			String sql = "DELETE FROM telefone WHERE funcionario_id = ?";
@@ -297,8 +295,9 @@ public class DAOTelefone implements Serializable, EntidadeGenericaDAO<Telefone> 
 
 		return pagination;
 	}
-	
-	public Pagination<Telefone> obterRegistrosPaginadosPreviewFuncionario(Integer numeroPagina, Integer registrosPorPagina, Long idFucionario) {
+
+	public Pagination<Telefone> obterRegistrosPaginadosPreviewPorFuncionario(Integer numeroPagina,
+			Integer registrosPorPagina, Long idFucionario) {
 		Pagination<Telefone> pagination = new Pagination<>();
 
 		try {
@@ -306,7 +305,7 @@ public class DAOTelefone implements Serializable, EntidadeGenericaDAO<Telefone> 
 
 			String sql = "SELECT t.id, t.numero, t.funcionario_id FROM telefone t WHERE funcionario_id = ? ORDER BY id DESC LIMIT ? OFFSET ?";
 			stmt = conexao.prepareStatement(sql);
-			
+
 			stmt.setLong(1, idFucionario);
 			stmt.setInt(2, registrosPorPagina);
 			stmt.setInt(3, offset);
@@ -327,57 +326,6 @@ public class DAOTelefone implements Serializable, EntidadeGenericaDAO<Telefone> 
 			}
 
 			int qtdRegistros = obterTotalRegistros();
-			int totalPaginas = Calculador.obterTotalPaginas(qtdRegistros, registrosPorPagina);
-
-			pagination.setContent(telefones);
-			pagination.setTotalPages(totalPaginas);
-			pagination.setTotalElements(qtdRegistros);
-			pagination.setPageable(new Pageable(offset, registrosPorPagina, numeroPagina));
-
-		} catch (SQLException e) {
-			FabricaConexao.connectionRollback();
-			e.printStackTrace();
-		}
-
-		return pagination;
-	}
-
-	//REmover
-	@Override
-	public Pagination<Telefone> obterRegistrosPaginadosPreviewPorNome(String parteNome, Integer numeroPagina,
-			Integer registrosPorPagina) {
-		Pagination<Telefone> pagination = new Pagination<>();
-
-		try {
-			int offset = (numeroPagina - 1) * registrosPorPagina;
-
-			String sql = "SELECT t.id, t.numero, t.funcionario_id FROM telefone t "
-					+ "WHERE LOWER(t.numero) LIKE LOWER(?) " + "ORDER BY id DESC LIMIT ? OFFSET ?";
-
-			stmt = conexao.prepareStatement(sql);
-			stmt.setString(1, "%" + parteNome + "%");
-			stmt.setInt(2, registrosPorPagina);
-			stmt.setInt(3, offset);
-
-			ResultSet resultado = stmt.executeQuery();
-			FabricaConexao.connectionCommit();
-
-			List<Telefone> telefones = new ArrayList<>();
-			while (resultado.next()) {
-				Telefone telefone = new Telefone();
-				telefone.setId(resultado.getLong("id"));
-				telefone.setNumero(resultado.getString("numero"));
-
-				// Recuperar o funcionário associado ao telefone
-				Long funcionarioId = resultado.getLong("funcionario_id");
-				Funcionario funcionario = new Funcionario();
-				funcionario.setId(funcionarioId);
-				telefone.setFuncionario(funcionario);
-
-				telefones.add(telefone);
-			}
-
-			int qtdRegistros = obterTotalRegistrosPorNome(parteNome);
 			int totalPaginas = Calculador.obterTotalPaginas(qtdRegistros, registrosPorPagina);
 
 			pagination.setContent(telefones);

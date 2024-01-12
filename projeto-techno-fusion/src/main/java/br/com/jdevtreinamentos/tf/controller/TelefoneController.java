@@ -192,7 +192,7 @@ public class TelefoneController extends HttpServlet {
 			if (funcionarioDaPaginaTelefone.isPresent()) {
 
 				Funcionario funcionario = funcionarioDaPaginaTelefone.get();
-				Pagination<Telefone> pagination = daoTelefone.obterRegistrosPaginadosPreviewFuncionario(page,
+				Pagination<Telefone> pagination = daoTelefone.obterRegistrosPaginadosPreviewPorFuncionario(page,
 						REGISTROS_POR_PAGINA, funcionario.getId());
 				request.setAttribute("funcionarioTelefone", funcionario);
 

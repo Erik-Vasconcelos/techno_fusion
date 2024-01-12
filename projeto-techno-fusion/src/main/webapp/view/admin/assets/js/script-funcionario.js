@@ -48,7 +48,6 @@ function verificarSeDeveAbrirAbaSalvar() {
 	let idFuncionario = url.searchParams.get("idFuncionario");
 
 	let urlPura = url.toString().split('?')[0]
-	console.log(urlPura);
 
 	if (idFuncionario != null && idFuncionario != '' && urlPura.endsWith('/funcionario')) {
 		var encapuladorIdFuncionario = $("<button>", {
@@ -178,7 +177,7 @@ function editar(e) {
 	}).fail(function(xhr, status, errorThrown) {
 		$("#preloader").hide();
 		
-		if(xhr.status === 401){
+		if(xhr.status === 403){
 			let url = $('#formFuncionario').attr('action');
 			url = url.replace("funcionario", "login");
 			
