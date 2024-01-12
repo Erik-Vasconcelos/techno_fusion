@@ -20,6 +20,7 @@ import br.com.jdevtreinamentos.tf.controller.infra.ResponseEntity;
 import br.com.jdevtreinamentos.tf.controller.infra.StatusResposta;
 import br.com.jdevtreinamentos.tf.infrastructure.connection.FabricaConexao;
 import br.com.jdevtreinamentos.tf.model.Funcionario;
+import br.com.jdevtreinamentos.tf.model.enumeration.PerfilFuncionario;
 
 /**
  * Filtro para realizar a seleção apenas dos usuário que estão logados para
@@ -47,15 +48,15 @@ public class LoginFilter extends HttpFilter implements Filter {
 		}
 	}
 
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException {
 		HttpServletRequest requestHttp = (HttpServletRequest) request;
 		HttpServletResponse responseHttp = (HttpServletResponse) response;
 		HttpSession sessao = requestHttp.getSession(false);
 		try {
-			if(sessao == null) {
+			if (sessao == null) {
 				sessao = requestHttp.getSession();
 			}
-			
+
 			Funcionario funcionario = (Funcionario) sessao.getAttribute("usuario");
 
 			String recursoSolicitado = requestHttp.getServletPath();
@@ -73,22 +74,38 @@ public class LoginFilter extends HttpFilter implements Filter {
 
 				responseHttp.sendRedirect(requestHttp.getContextPath() + "/login");
 			} else {
-				chain.doFilter(request, response);
+
+				if (acessoNegado(funcionario, recursoSolicitado)) {
+
+					responseHttp.sendError(HttpServletResponse.SC_FORBIDDEN);
+				} else {
+					chain.doFilter(request, response);
+				}
+
 			}
 		} catch (Exception e) {
-			ResponseEntity<Funcionario> resposta = new ResponseEntity<>(StatusResposta.ERROR, null,
-					"Erro no servidor: " + e.getMessage());
-
 			e.printStackTrace();
-			try {
-				if(sessao == null) {
-					sessao = requestHttp.getSession();
-				}
-				sessao.setAttribute("resposta", resposta);
-				responseHttp.sendRedirect(requestHttp.getContextPath() + "/erro");
-			} catch (IOException e1) {
-				e1.printStackTrace();
+
+			responseHttp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	private boolean acessoNegado(Funcionario funcionario, String recursoSolicitado) {
+		String[] recursosPermitidosFuncionario = { "/funcionario/perfil", "/funcionario/inicio" };
+
+		boolean isFuncionario = funcionario.getPerfil().equals(PerfilFuncionario.FUNCIONARIO);
+		boolean acessoNegado = true;
+
+		for (String recursoPermitido : recursosPermitidosFuncionario) {
+			if (recursoSolicitado.startsWith(recursoPermitido)) {
+				acessoNegado = false;
 			}
+		}
+
+		if (isFuncionario && acessoNegado) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
