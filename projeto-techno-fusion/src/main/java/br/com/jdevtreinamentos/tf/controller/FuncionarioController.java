@@ -66,14 +66,6 @@ public class FuncionarioController extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
-		// Atualiza a sessao sempre que o usuário interage com a servlet, evitando
-		// assim, que a sessao expire quando ele estiver usando a aplicação
-		
-//		SessaoUtil.atualizarSessao(request);
-
-		// FIXME - Mostrar excecao de usuario sem imagem no download
-
 		try {
 			if (request.getServletPath().endsWith("editar")) {
 				HttpSession session = request.getSession(false);
@@ -289,14 +281,6 @@ public class FuncionarioController extends HttpServlet {
 
 					response.setHeader("Content-Disposition",
 							"attachment;filename=" + primeiroNome + "." + extensaoImagem);
-					// Define o por quanto tempo o browser pode armazenar em cache a imagem
-					// response.setHeader("Cache-Control", "public, max-age=3600");
-					// Define a data de imagem quando a imagem em cache vai expirar
-					// response.setDateHeader("Expires", System.currentTimeMillis() + 3600 * 1000);
-
-					// Codigo/identificador etag para a entidade imagem
-					// String etag = DigestUtils.sha256Hex(primeiroNome + extensaoImagem);
-					// response.setHeader("ETag", etag);
 
 					response.getOutputStream().write(new Base64().decode(imagemBase64));
 				} else {
@@ -374,7 +358,7 @@ public class FuncionarioController extends HttpServlet {
 				&& funcionario.getLogin().length() <= QTD_MAX_CARACTERES_LOGIN;
 
 		if (!salarioValido) {
-			throw new DadosInvalidosException("O salário é obrigatório e deve ser menor do que "
+			throw new DadosInvalidosException("O salário é obrigatório e deve ser menor que "
 					+ NumberFormat.getCurrencyInstance(new Locale("pt", "BR")).format(SALARIO_MAXIMO));
 		}
 

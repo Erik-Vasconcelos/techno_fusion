@@ -11,9 +11,9 @@ triggerTabList.forEach(triggerEl => {
 })
 
 //Verifica se houve algum erro, em caso afirmativo muda para a tela de cadastro/atualização 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
 	ativarBtnPaginaAtual();
-	
+
 	$("#preloader").show();
 
 	var operacaoErro = $('#operacaoErro').val();
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	$("#preloader").hide();
 });
 
-$(function() {
+$(function () {
 	$('#salario').maskMoney({
 		prefix: 'R$ ',
 		thousands: '.',
@@ -77,7 +77,7 @@ function configurarDadosAbaSalvar() {
 }
 
 function limparAbaSalvarAoMudarAba() {
-	$('#nav-tab button').on('shown.bs.tab', function(e) {
+	$('#nav-tab button').on('shown.bs.tab', function (e) {
 		var abaAtiva = e.target.id;
 
 		var id = $('#id').val();
@@ -101,7 +101,7 @@ function enviarForm() {
 
 function validarCamposRequired() {
 	var camposValidos = true;
-	$('#formFuncionario [required]').each(function() {
+	$('#formFuncionario [required]').each(function () {
 		var valorCampo = $(this).val();
 		if (!valorCampo.trim()) {
 			camposValidos = false;
@@ -141,7 +141,7 @@ function previewImage() {
 		} else {
 			var reader = new FileReader();
 
-			reader.onload = function(e) {
+			reader.onload = function (e) {
 				imagePreview.src = e.target.result;
 			};
 
@@ -165,25 +165,25 @@ function editar(e) {
 		method: "get",
 		url: action + "/editar",
 		data: "id=" + id,
-		success: function(response) {
+		success: function (response) {
 			configDadosEdicao(response);
 
 			setTabEdicao();
 		},
 		timeout: 10000
-	}).done(function() {
+	}).done(function () {
 		$("#preloader").hide();
 
-	}).fail(function(xhr, status, errorThrown) {
+	}).fail(function (xhr, status, errorThrown) {
 		$("#preloader").hide();
-		
-		if(xhr.status === 403){
+
+		if (xhr.status === 401) {
 			let url = $('#formFuncionario').attr('action');
 			url = url.replace("funcionario", "login");
-			
+
 			window.location.href = url;
 		}
-		
+
 		var boxMessage = document.getElementById("modalBody");
 
 		if (xhr.responseText != null && xhr.responseText != '') {
@@ -321,4 +321,4 @@ function removerParamUrl() {
 	window.history.replaceState({}, document.title, url.href);
 }
 
-function ativarBtnPaginaAtual(){$('ul-menu > li > a').removeClass('active'); $('#btnPaginaFuncinarios').addClass('active');}
+function ativarBtnPaginaAtual() { $('ul-menu > li > a').removeClass('active'); $('#btnPaginaFuncinarios').addClass('active'); }

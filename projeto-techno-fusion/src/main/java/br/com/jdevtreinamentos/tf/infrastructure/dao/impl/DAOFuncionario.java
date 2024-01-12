@@ -414,7 +414,6 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 		return totalFuncionarios;
 	}
 
-	@Override
 	public int obterTotalRegistrosPorNome(String parteNome) {
 		int total = 0;
 		try {

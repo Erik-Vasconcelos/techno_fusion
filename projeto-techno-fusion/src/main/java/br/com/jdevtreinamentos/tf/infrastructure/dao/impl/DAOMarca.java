@@ -249,8 +249,6 @@ public class DAOMarca implements Serializable, EntidadeGenericaDAO<Marca> {
         return pagination;
     }
 
-    
-    @Override
     public int obterTotalRegistrosPorNome(String parteNome) {
         int total = 0;
         try {

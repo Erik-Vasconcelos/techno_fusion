@@ -28,8 +28,6 @@ public interface EntidadeGenericaDAO<T> {
 
 	public int obterTotalRegistros();
 
-	public int obterTotalRegistrosPorNome(String parteNome);
-
 	public boolean registroExiste(Long id);
 
 }

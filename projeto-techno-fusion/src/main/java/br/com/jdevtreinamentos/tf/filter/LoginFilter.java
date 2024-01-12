@@ -21,6 +21,7 @@ import br.com.jdevtreinamentos.tf.controller.infra.StatusResposta;
 import br.com.jdevtreinamentos.tf.infrastructure.connection.FabricaConexao;
 import br.com.jdevtreinamentos.tf.model.Funcionario;
 import br.com.jdevtreinamentos.tf.model.enumeration.PerfilFuncionario;
+import br.com.jdevtreinamentos.tf.util.SessaoUtil;
 
 /**
  * Filtro para realizar a seleção apenas dos usuário que estão logados para
@@ -31,7 +32,7 @@ import br.com.jdevtreinamentos.tf.model.enumeration.PerfilFuncionario;
  * @version 0.1 2024-01-10
  */
 
-@WebFilter(filterName = "filtroLogin", urlPatterns = { "/funcionario/*", "/marca/*"})
+@WebFilter(filterName = "filtroLogin", urlPatterns = { "/funcionario/*", "/produto/*", "/marca/*"})
 public class LoginFilter extends HttpFilter implements Filter {
 
 	private static final long serialVersionUID = 1L;
@@ -52,7 +53,6 @@ public class LoginFilter extends HttpFilter implements Filter {
 		HttpServletRequest requestHttp = (HttpServletRequest) request;
 		HttpServletResponse responseHttp = (HttpServletResponse) response;
 		HttpSession sessao = requestHttp.getSession(false);
-		
 		
 		try {
 			if (sessao == null) {
@@ -82,6 +82,7 @@ public class LoginFilter extends HttpFilter implements Filter {
 					responseHttp.sendError(HttpServletResponse.SC_FORBIDDEN);
 				} else {
 					chain.doFilter(request, response);
+					SessaoUtil.atualizarTempoSessao(requestHttp);
 				}
 
 			}

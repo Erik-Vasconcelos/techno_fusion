@@ -342,24 +342,6 @@ public class DAOTelefone implements Serializable, EntidadeGenericaDAO<Telefone> 
 	}
 
 	@Override
-	public int obterTotalRegistrosPorNome(String parteNome) {
-		int total = 0;
-		try {
-			String sql = "SELECT COUNT(*) FROM telefone WHERE LOWER(numero) LIKE LOWER(?)";
-			PreparedStatement stmtCount = conexao.prepareStatement(sql);
-			stmtCount.setString(1, "%" + parteNome + "%");
-			ResultSet resultadoCount = stmtCount.executeQuery();
-			resultadoCount.next();
-			total = resultadoCount.getInt(1);
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return total;
-	}
-
-	@Override
 	public boolean registroExiste(Long id) {
 		boolean existe = false;
 

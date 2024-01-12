@@ -20,8 +20,22 @@ CREATE TABLE IF NOT EXISTS telefone (
 );
 
 CREATE TABLE IF NOT EXISTS marca (
-    id SERIAL PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     nome CHARACTER VARYING(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS produto (
+    id INTEGER PRIMARY KEY,
+    descricao CHARACTER VARYING(255) NOT NULL,
+    modelo CHARACTER VARYING(255),
+    caracteristicas TEXT,
+    imagem TEXT,
+    valor DOUBLE PRECISION NOT NULL,
+    desconto DOUBLE PRECISION,
+    marca_id INTEGER,
+    cadastrador_id INTEGER,
+    FOREIGN KEY (marca_id) REFERENCES marca(id),
+    FOREIGN KEY (cadastrador_id) REFERENCES funcionario(id)
 );
 
 CREATE SEQUENCE IF NOT EXISTS funcionario_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
@@ -30,6 +44,8 @@ CREATE SEQUENCE IF NOT EXISTS telefone_id_seq INCREMENT 1 START 1 MINVALUE 1 MAX
 
 CREATE SEQUENCE IF NOT EXISTS marca_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
 
+CREATE SEQUENCE IF NOT EXISTS produto_id_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
 ALTER TABLE funcionario
 ALTER COLUMN id
 SET DEFAULT nextval('funcionario_id_seq'::regclass);
@@ -37,6 +53,14 @@ SET DEFAULT nextval('funcionario_id_seq'::regclass);
 ALTER TABLE telefone
 ALTER COLUMN id
 SET DEFAULT nextval('telefone_id_seq'::regclass);
+
+ALTER TABLE telefone
+ALTER COLUMN id
+SET DEFAULT nextval('marca_id_seq'::regclass);
+
+ALTER TABLE produto
+ALTER COLUMN id
+SET DEFAULT nextval('produto_id_seq'::regclass);
 
 ALTER TABLE telefone
 ADD CONSTRAINT fk_telefone_funcionario FOREIGN KEY (funcionario_id) REFERENCES funcionario(id);
