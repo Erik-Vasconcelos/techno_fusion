@@ -244,7 +244,7 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 		try {
 			String sql = "SELECT f.id, f.nome, f.sexo, f.data_nascimento, f.email, f.perfil, f.salario, f.imagem, f.login FROM funcionario f ORDER BY id DESC";
 			stmt = conexao.prepareStatement(sql);
-
+			
 			ResultSet resultado = stmt.executeQuery();
 			FabricaConexao.connectionCommit();
 
@@ -272,17 +272,18 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 	}
 
 	@Override
-	public Pagination<Funcionario> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina) {
+	public Pagination<Funcionario> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina, Long idUsuarioLogado) {
 		Pagination<Funcionario> pagination = new Pagination<>();
 
 		ResultSet resultado = null;
 		try {
 			int offset = (numeroPagina - 1) * registrosPorPagina;
 
-			String sql = "SELECT f.id, f.nome, f.sexo, f.email, f.perfil, f.salario FROM funcionario f ORDER BY id DESC LIMIT ? OFFSET ?";
+			String sql = "SELECT f.id, f.nome, f.sexo, f.email, f.perfil, f.salario FROM funcionario f WHERE f.id <> ? ORDER BY id DESC LIMIT ? OFFSET ?";
 			stmt = conexao.prepareStatement(sql);
-			stmt.setInt(1, registrosPorPagina);
-			stmt.setInt(2, offset);
+			stmt.setLong(1, idUsuarioLogado);
+			stmt.setInt(2, registrosPorPagina);
+			stmt.setInt(3, offset);
 
 			resultado = stmt.executeQuery();
 			FabricaConexao.connectionCommit();
@@ -328,19 +329,20 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 	}
 
 	public Pagination<Funcionario> obterRegistrosPaginadosPreviewPorNome(String parteNome, Integer numeroPagina,
-			Integer registrosPorPagina) {
+			Integer registrosPorPagina, Long idUsuarioLogado) {
 		Pagination<Funcionario> pagination = new Pagination<>();
 
 		try {
 			int offset = (numeroPagina - 1) * registrosPorPagina;
 
 			String sql = "SELECT f.id, f.nome, f.sexo, f.email, f.perfil, f.salario FROM funcionario f "
-					+ "WHERE LOWER(f.nome) LIKE LOWER(?) " + "ORDER BY id DESC LIMIT ? OFFSET ?";
+					+ "WHERE LOWER(f.nome) LIKE LOWER(?) AND f.id <> ? " + "ORDER BY id DESC LIMIT ? OFFSET ?";
 
 			stmt = conexao.prepareStatement(sql);
 			stmt.setString(1, "%" + parteNome + "%");
-			stmt.setInt(2, registrosPorPagina);
-			stmt.setInt(3, offset);
+			stmt.setLong(2, idUsuarioLogado);
+			stmt.setInt(3, registrosPorPagina);
+			stmt.setInt(4, offset);
 
 			ResultSet resultado = stmt.executeQuery();
 			FabricaConexao.connectionCommit();

@@ -35,6 +35,7 @@ import br.com.jdevtreinamentos.tf.model.enumeration.PerfilFuncionario;
 import br.com.jdevtreinamentos.tf.util.Calculador;
 import br.com.jdevtreinamentos.tf.util.GeradorSenha;
 import br.com.jdevtreinamentos.tf.util.Pagination;
+import br.com.jdevtreinamentos.tf.util.SessaoUtil;
 
 /**
  * Classe responsável por receber e processar as requisições para os recursos
@@ -69,7 +70,7 @@ public class FuncionarioController extends HttpServlet {
 		try {
 			if (request.getServletPath().endsWith("editar")) {
 				HttpSession session = request.getSession(false);
-				
+
 				if (session == null || session.isNew()) {
 					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
 				} else {
@@ -231,6 +232,8 @@ public class FuncionarioController extends HttpServlet {
 
 			Pagination<Funcionario> pagination = null;
 
+			Long idUsuarioLogado = SessaoUtil.getUsuarioLogado(request).getId();
+
 			if (pageString != null && !pageString.trim().isEmpty()) {
 				int pagina = Integer.parseInt(pageString);
 
@@ -241,7 +244,7 @@ public class FuncionarioController extends HttpServlet {
 
 				if (paginaValida) {
 					pagination = daoFuncionario.obterRegistrosPaginadosPreviewPorNome(valor, pagina,
-							REGISTROS_POR_PAGINA);
+							REGISTROS_POR_PAGINA, idUsuarioLogado);
 
 				} else {
 					throw new IllegalArgumentException("A página #" + pagina + " não existe!");
@@ -249,7 +252,7 @@ public class FuncionarioController extends HttpServlet {
 
 			} else {
 				pagination = daoFuncionario.obterRegistrosPaginadosPreviewPorNome(valor, PAGINA_INICIAL,
-						REGISTROS_POR_PAGINA);
+						REGISTROS_POR_PAGINA, idUsuarioLogado);
 			}
 
 			request.setAttribute("valorPesquisa", valor);
@@ -323,7 +326,10 @@ public class FuncionarioController extends HttpServlet {
 	}
 
 	private void encaminharParaPaginaFuncionarios(HttpServletRequest request, HttpServletResponse response, int page) {
-		Pagination<Funcionario> pagination = daoFuncionario.obterRegistrosPaginadosPreview(page, REGISTROS_POR_PAGINA);
+		Long idUsuarioLogado = SessaoUtil.getUsuarioLogado(request).getId();
+
+		Pagination<Funcionario> pagination = daoFuncionario.obterRegistrosPaginadosPreview(page, REGISTROS_POR_PAGINA,
+				idUsuarioLogado);
 		encaminharParaPaginaFuncionarios(request, response, pagination);
 	}
 

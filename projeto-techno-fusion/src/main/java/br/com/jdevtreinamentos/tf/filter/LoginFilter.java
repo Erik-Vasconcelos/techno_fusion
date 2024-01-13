@@ -32,7 +32,7 @@ import br.com.jdevtreinamentos.tf.util.SessaoUtil;
  * @version 0.1 2024-01-10
  */
 
-@WebFilter(filterName = "filtroLogin", urlPatterns = { "/funcionario/*", "/produto/*", "/marca/*"})
+@WebFilter(filterName = "filtroLogin", urlPatterns = {"/inicio/*", "/funcionario/*", "/produto/*", "/marca/*"})
 public class LoginFilter extends HttpFilter implements Filter {
 
 	private static final long serialVersionUID = 1L;

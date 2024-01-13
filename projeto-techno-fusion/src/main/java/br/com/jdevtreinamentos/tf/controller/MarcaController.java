@@ -21,6 +21,7 @@ import br.com.jdevtreinamentos.tf.infrastructure.dao.impl.DAOMarca;
 import br.com.jdevtreinamentos.tf.model.Marca;
 import br.com.jdevtreinamentos.tf.util.Calculador;
 import br.com.jdevtreinamentos.tf.util.Pagination;
+import br.com.jdevtreinamentos.tf.util.SessaoUtil;
 
 /**
  * Classe responsável por receber e processar as requisições para os recursos
@@ -213,7 +214,10 @@ public class MarcaController extends HttpServlet {
 	}
 
 	private void encaminharParaPaginaMarcas(HttpServletRequest request, HttpServletResponse response, int page) {
-		Pagination<Marca> pagination = daoMarca.obterRegistrosPaginadosPreview(page, REGISTROS_POR_PAGINA);
+		Long idUsuarioLogado = SessaoUtil.getUsuarioLogado(request).getId();
+
+		Pagination<Marca> pagination = daoMarca.obterRegistrosPaginadosPreview(page, REGISTROS_POR_PAGINA,
+				idUsuarioLogado);
 		encaminharParaPaginaMarcas(request, response, pagination);
 	}
 

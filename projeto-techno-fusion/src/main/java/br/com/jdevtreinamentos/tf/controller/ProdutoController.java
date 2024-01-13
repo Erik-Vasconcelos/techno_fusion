@@ -298,7 +298,9 @@ public class ProdutoController extends HttpServlet {
 	}
 
 	private void encaminharParaPaginaProdutos(HttpServletRequest request, HttpServletResponse response, int page) {
-		Pagination<Produto> pagination = daoProduto.obterRegistrosPaginadosPreview(page, REGISTROS_POR_PAGINA);
+		Long idUsuarioLogado = SessaoUtil.getUsuarioLogado(request).getId();
+		
+		Pagination<Produto> pagination = daoProduto.obterRegistrosPaginadosPreview(page, REGISTROS_POR_PAGINA, idUsuarioLogado);
 		encaminharParaPaginaProdutos(request, response, pagination);
 	}
 

@@ -165,7 +165,7 @@ public class DAOMarca implements Serializable, EntidadeGenericaDAO<Marca> {
     }
 
     @Override
-    public Pagination<Marca> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina) {
+    public Pagination<Marca> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina, Long idUsuarioLogado) {
         Pagination<Marca> pagination = new Pagination<>();
 
         try {

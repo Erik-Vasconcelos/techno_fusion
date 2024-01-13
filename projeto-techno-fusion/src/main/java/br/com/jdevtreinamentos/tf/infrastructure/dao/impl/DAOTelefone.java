@@ -251,7 +251,7 @@ public class DAOTelefone implements Serializable, EntidadeGenericaDAO<Telefone> 
 	}
 
 	@Override
-	public Pagination<Telefone> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina) {
+	public Pagination<Telefone> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina, Long idUsuarioLogado) {
 		Pagination<Telefone> pagination = new Pagination<>();
 
 		try {

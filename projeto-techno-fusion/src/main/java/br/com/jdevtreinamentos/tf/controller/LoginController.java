@@ -85,7 +85,7 @@ public class LoginController extends HttpServlet {
 					response.sendRedirect(urlParaRedirecional.replaceFirst("\\/", ""));
 					request.getSession().removeAttribute("url");
 				} else {
-					response.sendRedirect("funcionario");
+					response.sendRedirect("inicio");
 				}
 
 			} else {

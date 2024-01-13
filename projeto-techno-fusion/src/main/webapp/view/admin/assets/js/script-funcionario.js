@@ -1,5 +1,8 @@
 /*################### Adicionado eventos antes de carregar #######################*/
 //Ativa as tabs
+
+$(function () { $('ul-menu > li > a').removeClass('active'); $('#btnPaginaFuncionarios').addClass('active'); });
+
 const triggerTabList = document.querySelectorAll('#nav-tab button')
 triggerTabList.forEach(triggerEl => {
 	const tabTrigger = new bootstrap.Tab(triggerEl)
@@ -12,8 +15,6 @@ triggerTabList.forEach(triggerEl => {
 
 //Verifica se houve algum erro, em caso afirmativo muda para a tela de cadastro/atualização 
 document.addEventListener('DOMContentLoaded', function () {
-	ativarBtnPaginaAtual();
-
 	$("#preloader").show();
 
 	var operacaoErro = $('#operacaoErro').val();
@@ -320,5 +321,3 @@ function removerParamUrl() {
 
 	window.history.replaceState({}, document.title, url.href);
 }
-
-function ativarBtnPaginaAtual() { $('ul-menu > li > a').removeClass('active'); $('#btnPaginaFuncinarios').addClass('active'); }

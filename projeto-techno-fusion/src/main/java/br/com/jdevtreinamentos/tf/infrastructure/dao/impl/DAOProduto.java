@@ -250,49 +250,9 @@ public class DAOProduto implements Serializable, EntidadeGenericaDAO<Produto> {
 
 		return totalProdutos;
 	}
-
-//	public List<Produto> buscarProdutosPorDescricao(String parteDescricao) {
-//		List<Produto> produtos = new ArrayList<>();
-//		try {
-//			String sql = "SELECT p.id, p.descricao, p.modelo, p.caracteristicas, p.imagem, p.valor, p.desconto, p.marca_id, p.cadastrador_id FROM produto p WHERE LOWER(p.descricao) LIKE LOWER(?)";
-//			stmt = conexao.prepareStatement(sql);
-//			stmt.setString(1, "%" + parteDescricao + "%");
-//
-//			ResultSet resultado = stmt.executeQuery();
-//			FabricaConexao.connectionCommit();
-//
-//			while (resultado.next()) {
-//				Produto produto = new Produto();
-//				produto.setId(resultado.getLong("id"));
-//				produto.setDescricao(resultado.getString("descricao"));
-//				produto.setModelo(resultado.getString("modelo"));
-//				produto.setCaracteristicas(resultado.getString("caracteristicas"));
-//				produto.setImagem(resultado.getString("imagem"));
-//				produto.setValor(resultado.getDouble("valor"));
-//				produto.setDesconto(resultado.getDouble("desconto"));
-//
-//				Long marcaId = resultado.getLong("marca_id");
-//				Marca marca = daoMarca.buscarPorId(marcaId).get();
-//				produto.setMarca(marca);
-//
-//				// Recuperar o funcionário cadastrador associado ao produto
-//				Long cadastradorId = resultado.getLong("cadastrador_id");
-//				Funcionario cadastrador = daoFuncionario.buscarNomePorId(cadastradorId).get();
-//				produto.setCadastrador(cadastrador);
-//
-//				produtos.add(produto);
-//			}
-//
-//		} catch (SQLException e) {
-//			FabricaConexao.connectionRollback();
-//			e.printStackTrace();
-//		}
-//
-//		return produtos;
-//	}
-
+	
 	@Override
-	public Pagination<Produto> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina) {
+	public Pagination<Produto> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina, Long idUsuarioLogado) {
 		Pagination<Produto> pagination = new Pagination<>();
 
 		try {
