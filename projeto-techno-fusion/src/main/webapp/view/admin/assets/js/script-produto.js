@@ -108,7 +108,6 @@ function configurarDadosAbaSalvar() {
         minimumFractionDigits: 2
     });
 
-    // Adapte o ID do campo de salário conforme necessário
     $("#valorProduto").val("R$ " + formatter.format($("#valorProduto").val()));
 
     let imgString = $('#imagemArmazenada').val();
@@ -149,7 +148,7 @@ function validarCamposRequired() {
         var valorCampo = $(this).val();
         if (!valorCampo.trim()) {
             camposValidos = false;
-            return false; // Sair do loop
+            return false;
         }
     });
 

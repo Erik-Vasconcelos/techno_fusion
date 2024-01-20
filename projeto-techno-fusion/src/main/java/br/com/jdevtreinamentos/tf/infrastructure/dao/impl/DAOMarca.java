@@ -6,12 +6,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 
 import br.com.jdevtreinamentos.tf.infrastructure.connection.FabricaConexao;
 import br.com.jdevtreinamentos.tf.infrastructure.dao.service.EntidadeGenericaDAO;
 import br.com.jdevtreinamentos.tf.model.Marca;
+import br.com.jdevtreinamentos.tf.model.Produto;
 import br.com.jdevtreinamentos.tf.util.Calculador;
 import br.com.jdevtreinamentos.tf.util.Pageable;
 import br.com.jdevtreinamentos.tf.util.Pagination;
@@ -28,262 +30,329 @@ import br.com.jdevtreinamentos.tf.util.Pagination;
 
 public class DAOMarca implements Serializable, EntidadeGenericaDAO<Marca> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private Connection conexao;
-    private PreparedStatement stmt;
+	private Connection conexao;
+	private PreparedStatement stmt;
 
-    public DAOMarca() {
-        conexao = FabricaConexao.getConnection();
-    }
+	private DAOProduto daoProduto;
 
-    @Override
-    public Marca salvar(Marca entidade) {
-        Optional<Marca> optional = Optional.empty();
-        try {
-            String sql = "";
-            if (entidade.isNovo()) {
-                sql = "INSERT INTO marca(nome) VALUES(?)";
-                stmt = conexao.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-                stmt.setString(1, entidade.getNome());
-                stmt.execute();
-                FabricaConexao.connectionCommit();
+	public DAOMarca() {
+		conexao = FabricaConexao.getConnection();
+	}
 
-                ResultSet resultado = stmt.getGeneratedKeys();
+	@Override
+	public Marca salvar(Marca entidade) {
+		Optional<Marca> optional = Optional.empty();
+		try {
+			String sql = "";
+			if (entidade.isNovo()) {
+				sql = "INSERT INTO marca(nome) VALUES(?)";
+				stmt = conexao.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+				stmt.setString(1, entidade.getNome());
+				stmt.execute();
+				FabricaConexao.connectionCommit();
 
-                boolean temProximo = resultado.next();
+				ResultSet resultado = stmt.getGeneratedKeys();
 
-                if (temProximo) {
-                    optional = buscarPorId(resultado.getLong("id"));
-                    entidade.setId(optional.get().getId());
-                }
-            } else {
-                sql = "UPDATE marca SET nome=? WHERE id=?";
-                stmt = conexao.prepareStatement(sql);
-                stmt.setString(1, entidade.getNome());
-                stmt.setLong(2, entidade.getId());
+				boolean temProximo = resultado.next();
 
-                stmt.executeUpdate();
-                FabricaConexao.connectionCommit();
-                optional = buscarPorId(entidade.getId());
-            }
-        } catch (SQLException e) {
-            FabricaConexao.connectionRollback();
-            e.printStackTrace();
-        }
+				if (temProximo) {
+					optional = buscarPorId(resultado.getLong("id"));
+					entidade.setId(optional.get().getId());
+				}
+			} else {
+				sql = "UPDATE marca SET nome=? WHERE id=?";
+				stmt = conexao.prepareStatement(sql);
+				stmt.setString(1, entidade.getNome());
+				stmt.setLong(2, entidade.getId());
 
-        return optional.orElse(new Marca());
-    }
+				stmt.executeUpdate();
+				FabricaConexao.connectionCommit();
+				optional = buscarPorId(entidade.getId());
+			}
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
 
-    @Override
-    public Optional<Marca> buscarPorId(Long id) {
-        Optional<Marca> optional = Optional.empty();
-        try {
-            String sql = "SELECT id, nome FROM marca WHERE id = ?";
-            stmt = conexao.prepareStatement(sql);
-            stmt.setLong(1, id);
+		return optional.orElse(new Marca());
+	}
 
-            ResultSet resultado = stmt.executeQuery();
-            FabricaConexao.connectionCommit();
+	@Override
+	public Optional<Marca> buscarPorId(Long id) {
+		Optional<Marca> optional = Optional.empty();
+		try {
+			String sql = "SELECT id, nome FROM marca WHERE id = ?";
+			stmt = conexao.prepareStatement(sql);
+			stmt.setLong(1, id);
 
-            if (resultado.next()) {
-                Marca marca = new Marca();
-                marca.setId(resultado.getLong("id"));
-                marca.setNome(resultado.getString("nome"));
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
 
-                optional = Optional.of(marca);
-            }
-        } catch (SQLException e) {
-            FabricaConexao.connectionRollback();
-            e.printStackTrace();
-        }
+			if (resultado.next()) {
+				Marca marca = new Marca();
+				marca.setId(resultado.getLong("id"));
+				marca.setNome(resultado.getString("nome"));
 
-        return optional;
-    }
+				optional = Optional.of(marca);
+			}
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
 
-    @Override
-    public List<Marca> obterTodos() {
-        List<Marca> marcas = new ArrayList<>();
-        try {
-            String sql = "SELECT id, nome FROM marca ORDER BY id DESC";
-            stmt = conexao.prepareStatement(sql);
+		return optional;
+	}
 
-            ResultSet resultado = stmt.executeQuery();
-            FabricaConexao.connectionCommit();
+	public Optional<Marca> buscarPorIdComProdutos(Long id) {
+		Optional<Marca> optional = Optional.empty();
+		try {
+			String sql = "SELECT id, nome FROM marca WHERE id = ?";
+			stmt = conexao.prepareStatement(sql);
+			stmt.setLong(1, id);
 
-            while (resultado.next()) {
-                Marca marca = new Marca();
-                marca.setId(resultado.getLong("id"));
-                marca.setNome(resultado.getString("nome"));
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
 
-                marcas.add(marca);
-            }
-        } catch (SQLException e) {
-            FabricaConexao.connectionRollback();
-            e.printStackTrace();
-        }
+			if (resultado.next()) {
+				Marca marca = new Marca();
+				marca.setId(resultado.getLong("id"));
+				marca.setNome(resultado.getString("nome"));
 
-        return marcas;
-    }
+				instanciarDAOProduto();
+				
+				List<Produto> produtos = daoProduto.obterPorMarca(marca.getId());
+				marca.setProdutos(new LinkedHashSet<Produto>(produtos));
+				optional = Optional.of(marca);
+			}
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
 
-    @Override
-    public boolean excluirPorId(Long id) {
-        try {
-            String sql = "DELETE FROM marca WHERE id = ?";
-            stmt = conexao.prepareStatement(sql);
-            stmt.setLong(1, id);
+		return optional;
+	}
 
-            stmt.execute();
-            FabricaConexao.connectionCommit();
+	@Override
+	public List<Marca> obterTodos() {
+		List<Marca> marcas = new ArrayList<>();
+		try {
+			String sql = "SELECT id, nome FROM marca ORDER BY nome ASC";
+			stmt = conexao.prepareStatement(sql);
 
-            return true;
-        } catch (SQLException e) {
-            FabricaConexao.connectionRollback();
-            e.printStackTrace();
-            return false;
-        }
-    }
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
 
-    // Adicione outros métodos específicos se necessário
+			while (resultado.next()) {
+				Marca marca = new Marca();
+				marca.setId(resultado.getLong("id"));
+				marca.setNome(resultado.getString("nome"));
 
-    @Override
-    public int obterTotalRegistros() {
-        int totalMarcas = 0;
-        try {
-            String sql = "SELECT COUNT(*) FROM marca";
-            stmt = conexao.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
+				marcas.add(marca);
+			}
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
 
-            if (rs.next()) {
-                totalMarcas = rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+		return marcas;
+	}
 
-        return totalMarcas;
-    }
+	public List<Marca> obterTodosComProdutos() {
+		List<Marca> marcas = new ArrayList<>();
+		try {
+			String sql = "SELECT id, nome FROM marca ORDER BY nome ASC";
+			stmt = conexao.prepareStatement(sql);
 
-    @Override
-    public Pagination<Marca> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina, Long idUsuarioLogado) {
-        Pagination<Marca> pagination = new Pagination<>();
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
 
-        try {
-            int offset = (numeroPagina - 1) * registrosPorPagina;
+			while (resultado.next()) {
+				Marca marca = new Marca();
+				marca.setId(resultado.getLong("id"));
+				marca.setNome(resultado.getString("nome"));
+				
+				instanciarDAOProduto();
 
-            String sql = "SELECT id, nome FROM marca ORDER BY id DESC LIMIT ? OFFSET ?";
-            stmt = conexao.prepareStatement(sql);
-            stmt.setInt(1, registrosPorPagina);
-            stmt.setInt(2, offset);
+				List<Produto> produtos = daoProduto.obterPorMarca(marca.getId());
+				marca.setProdutos(new LinkedHashSet<Produto>(produtos));
 
-            ResultSet resultado = stmt.executeQuery();
-            FabricaConexao.connectionCommit();
+				marcas.add(marca);
+			}
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
 
-            List<Marca> marcas = new ArrayList<>();
-            while (resultado.next()) {
-                Marca marca = new Marca();
-                marca.setId(resultado.getLong("id"));
-                marca.setNome(resultado.getString("nome"));
+		return marcas;
+	}
 
-                marcas.add(marca);
-            }
+	@Override
+	public boolean excluirPorId(Long id) {
+		try {
+			String sql = "DELETE FROM marca WHERE id = ?";
+			stmt = conexao.prepareStatement(sql);
+			stmt.setLong(1, id);
 
-            int qtdRegistros = obterTotalRegistros();
-            int totalPaginas = Calculador.obterTotalPaginas(qtdRegistros, registrosPorPagina);
+			stmt.execute();
+			FabricaConexao.connectionCommit();
 
-            pagination.setContent(marcas);
-            pagination.setTotalPages(totalPaginas);
-            pagination.setTotalElements(qtdRegistros);
-            pagination.setPageable(new Pageable(offset, registrosPorPagina, numeroPagina));
+			return true;
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+			return false;
+		}
+	}
 
-        } catch (SQLException e) {
-            FabricaConexao.connectionRollback();
-            e.printStackTrace();
-        }
+	@Override
+	public int obterTotalRegistros() {
+		int totalMarcas = 0;
+		try {
+			String sql = "SELECT COUNT(*) FROM marca";
+			stmt = conexao.prepareStatement(sql);
+			ResultSet rs = stmt.executeQuery();
 
-        return pagination;
-    }
+			if (rs.next()) {
+				totalMarcas = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-    public Pagination<Marca> obterRegistrosPaginadosPreviewPorNome(String parteNome, Integer numeroPagina,
-            Integer registrosPorPagina) {
-        Pagination<Marca> pagination = new Pagination<>();
+		return totalMarcas;
+	}
 
-        try {
-            int offset = (numeroPagina - 1) * registrosPorPagina;
+	private void instanciarDAOProduto() {
+		if (daoProduto != null) {
+			return;
+		}
 
-            String sql = "SELECT m.id, m.nome FROM marca m "
-                    + "WHERE LOWER(m.nome) LIKE LOWER(?) " + "ORDER BY id DESC LIMIT ? OFFSET ?";
+		daoProduto = new DAOProduto();
+	}
 
-            stmt = conexao.prepareStatement(sql);
-            stmt.setString(1, "%" + parteNome + "%");
-            stmt.setInt(2, registrosPorPagina);
-            stmt.setInt(3, offset);
+	@Override
+	public Pagination<Marca> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina,
+			Long idUsuarioLogado) {
+		Pagination<Marca> pagination = new Pagination<>();
 
-            ResultSet resultado = stmt.executeQuery();
-            FabricaConexao.connectionCommit();
+		try {
+			int offset = (numeroPagina - 1) * registrosPorPagina;
 
-            List<Marca> marcas = new ArrayList<>();
-            while (resultado.next()) {
-                Marca marca = new Marca();
-                marca.setId(resultado.getLong("id"));
-                marca.setNome(resultado.getString("nome"));
+			String sql = "SELECT id, nome FROM marca ORDER BY id DESC LIMIT ? OFFSET ?";
+			stmt = conexao.prepareStatement(sql);
+			stmt.setInt(1, registrosPorPagina);
+			stmt.setInt(2, offset);
 
-                // Adicione outros atributos da entidade Marca conforme necessário
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
 
-                marcas.add(marca);
-            }
+			List<Marca> marcas = new ArrayList<>();
+			while (resultado.next()) {
+				Marca marca = new Marca();
+				marca.setId(resultado.getLong("id"));
+				marca.setNome(resultado.getString("nome"));
 
-            int qtdRegistros = obterTotalRegistrosPorNome(parteNome);
-            int totalPaginas = Calculador.obterTotalPaginas(qtdRegistros, registrosPorPagina);
+				marcas.add(marca);
+			}
 
-            pagination.setContent(marcas);
-            pagination.setTotalPages(totalPaginas);
-            pagination.setTotalElements(qtdRegistros);
-            pagination.setPageable(new Pageable(offset, registrosPorPagina, numeroPagina));
+			int qtdRegistros = obterTotalRegistros();
+			int totalPaginas = Calculador.obterTotalPaginas(qtdRegistros, registrosPorPagina);
 
-        } catch (SQLException e) {
-            FabricaConexao.connectionRollback();
-            e.printStackTrace();
-        }
+			pagination.setContent(marcas);
+			pagination.setTotalPages(totalPaginas);
+			pagination.setTotalElements(qtdRegistros);
+			pagination.setPageable(new Pageable(offset, registrosPorPagina, numeroPagina));
 
-        return pagination;
-    }
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
 
-    public int obterTotalRegistrosPorNome(String parteNome) {
-        int total = 0;
-        try {
-            String sql = "SELECT COUNT(*) FROM marca WHERE LOWER(nome) LIKE LOWER(?)";
-            PreparedStatement stmtCount = conexao.prepareStatement(sql);
-            stmtCount.setString(1, "%" + parteNome + "%");
-            ResultSet resultadoCount = stmtCount.executeQuery();
-            resultadoCount.next();
-            total = resultadoCount.getInt(1);
+		return pagination;
+	}
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+	public Pagination<Marca> obterRegistrosPaginadosPreviewPorNome(String parteNome, Integer numeroPagina,
+			Integer registrosPorPagina) {
+		Pagination<Marca> pagination = new Pagination<>();
 
-        return total;
-    }
+		try {
+			int offset = (numeroPagina - 1) * registrosPorPagina;
 
-    @Override
-    public boolean registroExiste(Long id) {
-        boolean existe = false;
+			String sql = "SELECT m.id, m.nome FROM marca m " + "WHERE LOWER(m.nome) LIKE LOWER(?) "
+					+ "ORDER BY id DESC LIMIT ? OFFSET ?";
 
-        try {
-            String sql = "SELECT COUNT(*) FROM marca WHERE id = ?";
-            PreparedStatement stmtVerificar = conexao.prepareStatement(sql);
-            stmtVerificar.setLong(1, id);
+			stmt = conexao.prepareStatement(sql);
+			stmt.setString(1, "%" + parteNome + "%");
+			stmt.setInt(2, registrosPorPagina);
+			stmt.setInt(3, offset);
 
-            ResultSet resultadoVerificar = stmtVerificar.executeQuery();
-            resultadoVerificar.next();
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
 
-            existe = resultadoVerificar.getInt(1) > 0;
+			List<Marca> marcas = new ArrayList<>();
+			while (resultado.next()) {
+				Marca marca = new Marca();
+				marca.setId(resultado.getLong("id"));
+				marca.setNome(resultado.getString("nome"));
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+				// Adicione outros atributos da entidade Marca conforme necessário
 
-        return existe;
-    }
+				marcas.add(marca);
+			}
+
+			int qtdRegistros = obterTotalRegistrosPorNome(parteNome);
+			int totalPaginas = Calculador.obterTotalPaginas(qtdRegistros, registrosPorPagina);
+
+			pagination.setContent(marcas);
+			pagination.setTotalPages(totalPaginas);
+			pagination.setTotalElements(qtdRegistros);
+			pagination.setPageable(new Pageable(offset, registrosPorPagina, numeroPagina));
+
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
+
+		return pagination;
+	}
+
+	public int obterTotalRegistrosPorNome(String parteNome) {
+		int total = 0;
+		try {
+			String sql = "SELECT COUNT(*) FROM marca WHERE LOWER(nome) LIKE LOWER(?)";
+			PreparedStatement stmtCount = conexao.prepareStatement(sql);
+			stmtCount.setString(1, "%" + parteNome + "%");
+			ResultSet resultadoCount = stmtCount.executeQuery();
+			resultadoCount.next();
+			total = resultadoCount.getInt(1);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return total;
+	}
+
+	@Override
+	public boolean registroExiste(Long id) {
+		boolean existe = false;
+
+		try {
+			String sql = "SELECT COUNT(*) FROM marca WHERE id = ?";
+			PreparedStatement stmtVerificar = conexao.prepareStatement(sql);
+			stmtVerificar.setLong(1, id);
+
+			ResultSet resultadoVerificar = stmtVerificar.executeQuery();
+			resultadoVerificar.next();
+
+			existe = resultadoVerificar.getInt(1) > 0;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return existe;
+	}
 }

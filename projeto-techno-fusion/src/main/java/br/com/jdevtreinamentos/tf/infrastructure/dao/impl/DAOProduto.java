@@ -212,6 +212,42 @@ public class DAOProduto implements Serializable, EntidadeGenericaDAO<Produto> {
 
 		return produtos;
 	}
+	
+	public List<Produto> obterPorMarca(Long marcaId) {
+	    List<Produto> produtos = new ArrayList<>();
+
+	    try {
+	        String sql = "SELECT p.id, p.descricao, p.modelo, p.valor, p.desconto " +
+	                     "FROM produto p " +
+	                     "JOIN marca m ON p.marca_id = m.id " +
+	                     "WHERE p.marca_id = ? " +
+	                     "ORDER BY p.descricao ASC, p.modelo ASC";
+
+	        stmt = conexao.prepareStatement(sql);
+	        stmt.setLong(1, marcaId);
+
+	        ResultSet resultado = stmt.executeQuery();
+	        FabricaConexao.connectionCommit();
+
+	        while (resultado.next()) {
+	            Produto produto = new Produto();
+	            produto.setId(resultado.getLong("id"));
+	            produto.setDescricao(resultado.getString("descricao"));
+	            produto.setModelo(resultado.getString("modelo"));
+	            produto.setValor(resultado.getDouble("valor"));
+	            produto.setDesconto(resultado.getDouble("desconto"));
+
+	            produtos.add(produto);
+	        }
+
+	    } catch (SQLException e) {
+	        FabricaConexao.connectionRollback();
+	        e.printStackTrace();
+	    }
+
+	    return produtos;
+	}
+
 
 	@Override
 	public boolean excluirPorId(Long id) {
