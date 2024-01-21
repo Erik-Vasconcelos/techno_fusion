@@ -15,6 +15,7 @@ import br.com.jdevtreinamentos.tf.infrastructure.dao.service.EntidadeGenericaDAO
 import br.com.jdevtreinamentos.tf.model.Marca;
 import br.com.jdevtreinamentos.tf.model.Produto;
 import br.com.jdevtreinamentos.tf.util.Calculador;
+import br.com.jdevtreinamentos.tf.util.ModeloGrafico;
 import br.com.jdevtreinamentos.tf.util.Pageable;
 import br.com.jdevtreinamentos.tf.util.Pagination;
 
@@ -121,7 +122,7 @@ public class DAOMarca implements Serializable, EntidadeGenericaDAO<Marca> {
 				marca.setNome(resultado.getString("nome"));
 
 				instanciarDAOProduto();
-				
+
 				List<Produto> produtos = daoProduto.obterPorMarca(marca.getId());
 				marca.setProdutos(new LinkedHashSet<Produto>(produtos));
 				optional = Optional.of(marca);
@@ -172,7 +173,7 @@ public class DAOMarca implements Serializable, EntidadeGenericaDAO<Marca> {
 				Marca marca = new Marca();
 				marca.setId(resultado.getLong("id"));
 				marca.setNome(resultado.getString("nome"));
-				
+
 				instanciarDAOProduto();
 
 				List<Produto> produtos = daoProduto.obterPorMarca(marca.getId());
@@ -186,6 +187,115 @@ public class DAOMarca implements Serializable, EntidadeGenericaDAO<Marca> {
 		}
 
 		return marcas;
+	}
+
+	public ModeloGrafico<String, Double> obterValorMedioProdutosMarca() {
+		ModeloGrafico<String, Double> modelo = new ModeloGrafico<>();
+
+		try {
+			String sql = "SELECT m.id AS id_marca, m.nome AS nome_marca, ROUND(AVG(p.valor), 2) AS media FROM produto p "
+					+ "INNER JOIN marca m ON p.marca_id = m.id GROUP BY m.id, m.nome ORDER By m.nome ASC";
+
+			stmt = conexao.prepareStatement(sql);
+
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
+
+			List<String> marcas = new ArrayList<>();
+			List<Double> medias = new ArrayList<>();
+
+			while (resultado.next()) {
+				String nome = resultado.getString("nome_marca");
+
+				double valorMedio = resultado.getDouble("media");
+
+				marcas.add(nome);
+				medias.add(valorMedio);
+			}
+
+			modelo.setLabels(marcas);
+			modelo.setDataset(medias);
+
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
+
+		return modelo;
+	}
+
+	public ModeloGrafico<String, Double> obterValorMedioProdutosMarcaValorMaiorIgualQue(double valor) {
+		ModeloGrafico<String, Double> modelo = new ModeloGrafico<>();
+
+		try {
+			String sql = "SELECT m.id AS id_marca, m.nome AS nome_marca, ROUND(AVG(p.valor), 2) AS media "
+					+ "FROM produto p INNER JOIN marca m ON p.marca_id = m.id " + "GROUP BY m.id, m.nome "
+					+ "HAVING ROUND(AVG(p.valor), 2) >= ? ORDER BY nome_marca ASC";
+
+			stmt = conexao.prepareStatement(sql);
+			stmt.setDouble(1, valor);
+
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
+
+			List<String> marcas = new ArrayList<>();
+			List<Double> medias = new ArrayList<>();
+
+			while (resultado.next()) {
+				String nome = resultado.getString("nome_marca");
+
+				double valorMedio = resultado.getDouble("media");
+
+				marcas.add(nome);
+				medias.add(valorMedio);
+			}
+
+			modelo.setLabels(marcas);
+			modelo.setDataset(medias);
+
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
+
+		return modelo;
+	}
+
+	public ModeloGrafico<String, Double> obterValorMedioProdutosMarcaValorMenorIgualQue(double valor) {
+		ModeloGrafico<String, Double> modelo = new ModeloGrafico<>();
+
+		try {
+			String sql = "SELECT m.id AS id_marca, m.nome AS nome_marca, ROUND(AVG(p.valor), 2) AS media "
+					+ "FROM produto p INNER JOIN marca m ON p.marca_id = m.id " + "GROUP BY m.id, m.nome "
+					+ "HAVING ROUND(AVG(p.valor), 2) <= ? ORDER BY nome_marca ASC";
+
+			stmt = conexao.prepareStatement(sql);
+			stmt.setDouble(1, valor);
+
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
+
+			List<String> marcas = new ArrayList<>();
+			List<Double> medias = new ArrayList<>();
+
+			while (resultado.next()) {
+				String nome = resultado.getString("nome_marca");
+
+				double valorMedio = resultado.getDouble("media");
+
+				marcas.add(nome);
+				medias.add(valorMedio);
+			}
+
+			modelo.setLabels(marcas);
+			modelo.setDataset(medias);
+
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
+
+		return modelo;
 	}
 
 	@Override
@@ -296,8 +406,6 @@ public class DAOMarca implements Serializable, EntidadeGenericaDAO<Marca> {
 				Marca marca = new Marca();
 				marca.setId(resultado.getLong("id"));
 				marca.setNome(resultado.getString("nome"));
-
-				// Adicione outros atributos da entidade Marca conforme necessário
 
 				marcas.add(marca);
 			}

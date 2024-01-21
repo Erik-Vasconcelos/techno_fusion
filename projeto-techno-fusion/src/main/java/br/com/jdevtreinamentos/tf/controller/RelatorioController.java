@@ -11,7 +11,6 @@ import java.util.Optional;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +20,6 @@ import br.com.jdevtreinamentos.tf.controller.infra.ResponseEntity;
 import br.com.jdevtreinamentos.tf.controller.infra.StatusResposta;
 import br.com.jdevtreinamentos.tf.controller.infra.TipoDownload;
 import br.com.jdevtreinamentos.tf.exception.RecursoNaoEncontradoException;
-import br.com.jdevtreinamentos.tf.infrastructure.dao.impl.DAOFuncionario;
 import br.com.jdevtreinamentos.tf.infrastructure.dao.impl.DAOMarca;
 import br.com.jdevtreinamentos.tf.model.Funcionario;
 import br.com.jdevtreinamentos.tf.model.Marca;
@@ -29,14 +27,13 @@ import br.com.jdevtreinamentos.tf.util.JasperUtil;
 
 /**
  * Classe responsável por receber e processar as requisições para os recursos
- * relacionados aos serviços da entidade <strong>Funcionário<strong>.
+ * relacionados aos serviços de relatório.
  * 
  * @author Erik Vasconcelos
- * @since 2023-12-19
- * @version 0.2 2023-12-30
+ * @since 2024-01-14
+ * @version 0.1 2024-01-14
  */
 
-@MultipartConfig
 @WebServlet(name = "relatorioController", urlPatterns = { "/relatorio/marca-produtos" })
 public class RelatorioController extends HttpServlet {
 	private static final long serialVersionUID = 1L;

@@ -53,7 +53,7 @@ String contexto = request.getContextPath() + "/view/admin/";
 					<ol
 						class="breadcrumb bg-transparent mb-1 pb-0 pt-1 px-0 me-sm-6 me-5">
 						<li class="breadcrumb-item text-sm"><a
-							class="opacity-5 text-dark" href="javascript:;">Relatórios</a></li>
+							class="opacity-5 text-dark" href="javascript:;">Gráficos</a></li>
 
 					</ol>
 				</nav>
@@ -149,13 +149,15 @@ String contexto = request.getContextPath() + "/view/admin/";
 		<!-- End Navbar -->
 		<div class="container-fluid py-4 px-5">
 			<div class="row">
+			
+			
 				<div class="col-md-12">
 					<div class="d-md-flex align-items-center mb-3 mx-2">
 						<div class="mb-md-0 mb-3">
-							<h3 class="font-weight-bold mb-0">Relatório de marcas e
-								produtos</h3>
-							<p class="mb-0">Uma visão do produtos de cada marca de seus
-								detalhes</p>
+							<h3 class="font-weight-bold mb-0">Grafico de valor médio por
+								marca</h3>
+							<p class="mb-0">Uma visão do valor médio de produtos por
+								marca</p>
 						</div>
 					</div>
 				</div>
@@ -166,152 +168,33 @@ String contexto = request.getContextPath() + "/view/admin/";
 				<div class="col-12">
 					<div class="card shadow-xs border">
 						<div class="card-header border-bottom pb-0">
-							<form
-								action="<%=request.getContextPath()%>/relatorio/marca-produtos"
-								id="formRelatorio">
+							<input type="hidden" id="url"
+								value="<%=request.getContextPath()%>/grafico/valor-medio-marca/gerar">
 
-								<input type="hidden" name="acao" id="acao">
-
-								<div class="d-sm-flex align-items-center mb-3">
-									<div>
-										<h6 class="font-weight-semibold text-lg mb-0">Relatório</h6>
-										<p class="text-sm mb-sm-0 mb-2">Consulte ou realize o
-											download dos dados</p>
-									</div>
-									<div class="ms-auto d-flex">
-										<button type="button" class="btn btn-sm btn-white mb-0 me-2"
-											onclick="verRelatorioMarcaProduto()">Ver relatório</button>
-										<button type="button"
-											class="btn btn-sm btn-dark btn-icon d-flex align-items-center mb-0 me-2">
-											<span class="btn-inner--icon"> <svg width="16"
-													height="16" xmlns="http://www.w3.org/2000/svg" fill="none"
-													viewBox="0 0 24 24" stroke-width="1.5"
-													stroke="currentColor" class="d-block me-2">
-                        <path stroke-linecap="round"
-														stroke-linejoin="round"
-														d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                      </svg>
-											</span> <span class="btn-inner--text"
-												onclick="downloadRelatorioMarcaProdutoPdf()">Download
-												PDF</span>
-										</button>
-
-										<button type="button"
-											class="btn btn-sm btn-info btn-icon d-flex align-items-center mb-0">
-											<span class="btn-inner--icon"> <svg width="16"
-													height="16" xmlns="http://www.w3.org/2000/svg" fill="none"
-													viewBox="0 0 24 24" stroke-width="1.5"
-													stroke="currentColor" class="d-block me-2">
-                        <path stroke-linecap="round"
-														stroke-linejoin="round"
-														d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                      </svg>
-											</span> <span class="btn-inner--text"
-												onclick="downloadRelatorioMarcaProdutoXls()">Download
-												XLS</span>
-										</button>
-
-									</div>
+							<div class="d-sm-flex align-items-center mb-3">
+								<div>
+									<h6 class="font-weight-semibold text-lg mb-0">Gráfico</h6>
+									<p class="text-sm mb-sm-0 mb-2">Consulte os dados</p>
 								</div>
-								<div class="form-group">
-									<label for="marca">Marca</label> <select class="form-control"
-										id="marca" name="marca">
-										<option selected value="null">Todas</option>
-										<c:forEach items="${marcas}" var="marca">
-											<c:choose>
-												<c:when test="${marca.id eq marcaSelecionada.id}">
-													<option selected="selected" value="${marca.id}">${marca.nome}</option>
-												</c:when>
-												<c:otherwise>
-													<option value="${marca.id}">${marca.nome}</option>
-												</c:otherwise>
-											</c:choose>
-										</c:forEach>
-									</select>
+								<div class="ms-auto d-flex">
+									<button type="button" class="btn btn-sm btn-info mb-0 me-2"
+										onclick="gerarGrafico()">Ver gráfico</button>
 								</div>
-
-								<div class="card-body px-0 py-0">
-									<div class=" p-0 overflow-auto"
-										style="max-height: 500px; display: block; width: 100%">
-
-											<c:if test="${not empty relatorio}">
-
-												<table
-													class="table align-items-center justify-content-center mb-0 ">
-													<thead class="bg-gray-100">
-														<tr>
-															<th colspan="6"
-																class="text-secondary text-small font-weight-semibold opacity-7">Marca</th>
-														</tr>
-													</thead>
-													<tbody>
-
-
-														<c:forEach items="${relatorio}" var="m">
-															<tr>
-																<td colspan="5">
-																	<div class="d-flex px-2 py-2">
-																		<div class="my-auto">
-																			<h6 class="mb-0 text-sm">${m.nome}</h6>
-																		</div>
-																	</div>
-																</td>
-																<td></td>
-															</tr>
-															<c:if test="${not empty m.produtos}">
-																<thead class="bg-gray-100">
-																	<tr>
-																		<th colspan="2" align="center"
-																			class="text-secondary text-xs font-weight-semibold opacity-7">Produto</th>
-																		<th
-																			class="text-secondary text-xs font-weight-semibold opacity-7">Modelo</th>
-																		<th
-																			class="text-secondary text-xs font-weight-semibold opacity-7">Valor</th>
-																		<th
-																			class="text-secondary text-xs font-weight-semibold opacity-7">Desconto</th>
-																		<th
-																			class="text-secondary text-xs font-weight-semibold opacity-7">Valor
-																			final</th>
-																	</tr>
-																</thead>
-															</c:if>
-															<c:forEach items="${m.produtos}" var="p">
-																<tr>
-																	<td colspan="2" align="center">
-																		<div class="px-2">
-																			<div class="my-auto">
-																				<h6 class="mb-0 text-sm">${p.descricao}</h6>
-																			</div>
-																		</div>
-																	</td>
-																	<td class="align-middle">
-																		<div class="d-flex">
-																			<div class="ms-2">
-																				<p class="text-dark text-sm mb-0">${p.modelo}</p>
-																			</div>
-																		</div>
-																	</td>
-																	<td>
-																		<p
-																			class="text-sm font-weight-normal mb-0 valorParaFormatar">${p.valor}</p>
-																	</td>
-																	<td><span
-																		class="text-sm font-weight-normal descontoParaFormatar">${p.desconto}</span>
-																	</td>
-																	<td>
-																		<p
-																			class="text-sm font-weight-normal mb-0 valorParaFormatar">${p.valor - (p.valor * (p.desconto/100))}</p>
-																	</td>
-																</tr>
-															</c:forEach>
-														</c:forEach>
-													</tbody>
-												</table>
-											</c:if>
-									</div>
-
+							</div>
+							<div class="form-group mb-2" id="groupFiltro">
+								<div class="form-check form-switch">
+									  <input class="form-check-input" type="checkbox" role="switch" id="btnFiltro">
+									  <h5 class="form-control-label" for="btnFiltro">Filtro de valor</h5>
 								</div>
-							</form>
+							
+								<div id="groupInput">
+										
+								</div>
+							</div>
+
+							<div class="card-body px-0 py-0">
+								<canvas id="myChart"></canvas>
+							</div>
 						</div>
 					</div>
 
@@ -334,11 +217,33 @@ String contexto = request.getContextPath() + "/view/admin/";
 					</div>
 				</footer>
 			</div>
+			</div>
 	</main>
+
+	<div class="modal fade" id="modalMsg" data-bs-backdrop="static"
+		data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="staticBackdropLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="staticBackdropLabel">Erro</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body" id="modalBody"></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">Fechar</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<jsp:include page="fragmentos/scripts.jsp"></jsp:include>
 
-	<script src="<%=contexto%>assets/js/script-rel-marca-produtos.js"></script>
+	<script src="<%=contexto%>assets/js/script-grafico-valor-medio.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </body>
 
 </html>

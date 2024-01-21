@@ -63,15 +63,15 @@
         </li>
         
          <li class="nav-item mt-2">
-          <div class="d-flex align-items-center nav-link">
+          <a class="d-flex align-items-center nav-link" id="btnPaginaGraficos">
              <div class="icon icon-shape icon-sm px-0 text-center d-flex align-items-center justify-content-center">
               <img src="<%=contexto%>/view/admin/assets/img/grafico.png" alt="grafico" width="24">
             </div>
             <span class="font-weight-normal text-md ms-2">Gráficos</span>
-          </div>
+          </a>
         </li>
         <li class="nav-item border-start my-0 pt-2">
-          <a class="nav-link position-relative ms-0 ps-2 py-2 " href="../pages/profile.html">
+          <a class="nav-link position-relative ms-0 ps-2 py-2 " href="<%=contexto%>/grafico/valor-medio-marca" id="btnGraficoValorMedio">
             <span class="nav-link-text ms-1">Valor médio por marca</span>
           </a>
         </li>
