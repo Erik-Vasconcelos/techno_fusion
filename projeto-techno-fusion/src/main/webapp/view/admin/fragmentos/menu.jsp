@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
-    
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
  <%
  	String contexto = request.getContextPath();
  %>
@@ -21,6 +22,17 @@
             <span class="nav-link-text ms-1">Início</span>
           </a>
         </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="<%=contexto%>/funcionario/perfil" id="btnPaginaPerfil">
+             <div class="icon icon-shape icon-sm px-0 text-center d-flex align-items-center justify-content-center">
+              <img src="<%=contexto%>/view/admin/assets/img/perfil.png" alt="perfil" width="24">
+            </div>
+            <span class="nav-link-text ms-1">Perfil</span>
+          </a>
+        </li>
+        
+       <c:if test="${not empty usuario && usuario.perfil eq 'GERENTE'}">
         
 		<li class="nav-item">
           <a class="nav-link" href="<%=contexto%>/funcionario" id="btnPaginaFuncionarios">
@@ -75,7 +87,7 @@
             <span class="nav-link-text ms-1">Valor médio por marca</span>
           </a>
         </li>
-        
+        </c:if>
       </ul>
     </div>
     

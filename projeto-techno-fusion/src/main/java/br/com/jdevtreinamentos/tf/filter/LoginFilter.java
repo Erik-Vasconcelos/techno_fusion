@@ -32,7 +32,8 @@ import br.com.jdevtreinamentos.tf.util.SessaoUtil;
  * @version 0.1 2024-01-10
  */
 
-@WebFilter(filterName = "filtroLogin", urlPatterns = {"/inicio/*", "/funcionario/*", "/produto/*", "/marca/*", "/relatorio/*"})
+@WebFilter(filterName = "filtroLogin", urlPatterns = { "/inicio/*", "/funcionario/*", "/produto/*", "/marca/*",
+		"/relatorio/*" })
 public class LoginFilter extends HttpFilter implements Filter {
 
 	private static final long serialVersionUID = 1L;
@@ -53,7 +54,7 @@ public class LoginFilter extends HttpFilter implements Filter {
 		HttpServletRequest requestHttp = (HttpServletRequest) request;
 		HttpServletResponse responseHttp = (HttpServletResponse) response;
 		HttpSession sessao = requestHttp.getSession(false);
-		
+
 		try {
 			if (sessao == null) {
 				sessao = requestHttp.getSession();
@@ -94,7 +95,7 @@ public class LoginFilter extends HttpFilter implements Filter {
 	}
 
 	private boolean acessoNegado(Funcionario funcionario, String recursoSolicitado) {
-		String[] recursosPermitidosFuncionario = { "/funcionario/perfil", "/funcionario/inicio" };
+		String[] recursosPermitidosFuncionario = { "/inicio", "/funcionario/perfil" };
 
 		boolean isFuncionario = funcionario.getPerfil().equals(PerfilFuncionario.FUNCIONARIO);
 		boolean acessoNegado = true;

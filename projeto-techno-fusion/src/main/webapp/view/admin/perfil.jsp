@@ -13,7 +13,6 @@ String contexto = request.getContextPath() + "/view/admin/";
 <body class="g-sidenav-show bg-gray-100">
 	<div
 		class="main-content position-relative bg-gray-100 max-height-vh-100 h-100">
-		<!-- Sidenav Top -->
 		<nav
 			class="navbar bg-slate-900 navbar-expand-lg flex-wrap top-0 px-0 py-0">
 
@@ -289,35 +288,14 @@ String contexto = request.getContextPath() + "/view/admin/";
 							<script>
 								document.write(new Date().getFullYear())
 							</script>
-							Corporate UI by <a href="https://www.creative-tim.com"
-								class="text-secondary" target="_blank">Creative Tim</a>.
+							Techno Fusion
 						</div>
-					</div>
-					<div class="col-lg-6">
-						<ul
-							class="nav nav-footer justify-content-center justify-content-lg-end">
-							<li class="nav-item"><a href="https://www.creative-tim.com"
-								class="nav-link text-xs text-muted" target="_blank">Creative
-									Tim</a></li>
-							<li class="nav-item"><a
-								href="https://www.creative-tim.com/presentation"
-								class="nav-link text-xs text-muted" target="_blank">About Us</a>
-							</li>
-							<li class="nav-item"><a
-								href="https://www.creative-tim.com/blog"
-								class="nav-link text-xs text-muted" target="_blank">Blog</a></li>
-							<li class="nav-item"><a
-								href="https://www.creative-tim.com/license"
-								class="nav-link text-xs pe-0 text-muted" target="_blank">License</a>
-							</li>
-						</ul>
 					</div>
 				</div>
 			</div>
 		</footer>
 	</div>
-	s
-	<!--   Core JS Files   -->
+	
 	<jsp:include page="fragmentos/scripts.jsp"></jsp:include>
 
 	<script src="<%=contexto%>assets/js/script-perfil.js"></script>
