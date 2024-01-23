@@ -5,11 +5,11 @@
 	id="WebApp_ID" version="4.0">
 	<display-name>projeto-techno-fusion</display-name>
 	<welcome-file-list>
-		<welcome-file>login.jsp</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
-
+	
 	<session-config>
-		<session-timeout>30</session-timeout> <!-- 30 minutos de duração de sessao -->
+		<session-timeout>30</session-timeout>
 	</session-config>
 
 	<error-page>
