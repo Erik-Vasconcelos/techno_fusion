@@ -212,42 +212,39 @@ public class DAOProduto implements Serializable, EntidadeGenericaDAO<Produto> {
 
 		return produtos;
 	}
-	
+
 	public List<Produto> obterPorMarca(Long marcaId) {
-	    List<Produto> produtos = new ArrayList<>();
+		List<Produto> produtos = new ArrayList<>();
 
-	    try {
-	        String sql = "SELECT p.id, p.descricao, p.modelo, p.valor, p.desconto " +
-	                     "FROM produto p " +
-	                     "JOIN marca m ON p.marca_id = m.id " +
-	                     "WHERE p.marca_id = ? " +
-	                     "ORDER BY p.descricao ASC, p.modelo ASC";
+		try {
+			String sql = "SELECT p.id, p.descricao, p.modelo, p.valor, p.desconto " + "FROM produto p "
+					+ "JOIN marca m ON p.marca_id = m.id " + "WHERE p.marca_id = ? "
+					+ "ORDER BY p.descricao ASC, p.modelo ASC";
 
-	        stmt = conexao.prepareStatement(sql);
-	        stmt.setLong(1, marcaId);
+			stmt = conexao.prepareStatement(sql);
+			stmt.setLong(1, marcaId);
 
-	        ResultSet resultado = stmt.executeQuery();
-	        FabricaConexao.connectionCommit();
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
 
-	        while (resultado.next()) {
-	            Produto produto = new Produto();
-	            produto.setId(resultado.getLong("id"));
-	            produto.setDescricao(resultado.getString("descricao"));
-	            produto.setModelo(resultado.getString("modelo"));
-	            produto.setValor(resultado.getDouble("valor"));
-	            produto.setDesconto(resultado.getDouble("desconto"));
+			while (resultado.next()) {
+				Produto produto = new Produto();
+				produto.setId(resultado.getLong("id"));
+				produto.setDescricao(resultado.getString("descricao"));
+				produto.setModelo(resultado.getString("modelo"));
+				produto.setValor(resultado.getDouble("valor"));
+				produto.setDesconto(resultado.getDouble("desconto"));
 
-	            produtos.add(produto);
-	        }
+				produtos.add(produto);
+			}
 
-	    } catch (SQLException e) {
-	        FabricaConexao.connectionRollback();
-	        e.printStackTrace();
-	    }
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
 
-	    return produtos;
+		return produtos;
 	}
-
 
 	@Override
 	public boolean excluirPorId(Long id) {
@@ -286,9 +283,10 @@ public class DAOProduto implements Serializable, EntidadeGenericaDAO<Produto> {
 
 		return totalProdutos;
 	}
-	
+
 	@Override
-	public Pagination<Produto> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina, Long idUsuarioLogado) {
+	public Pagination<Produto> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina,
+			Long idUsuarioLogado) {
 		Pagination<Produto> pagination = new Pagination<>();
 
 		try {
@@ -395,6 +393,77 @@ public class DAOProduto implements Serializable, EntidadeGenericaDAO<Produto> {
 
 		return pagination;
 	}
+
+	public List<Produto> obterDezProdutosMaisRecentes() {
+		List<Produto> produtos = new ArrayList<>();
+
+		try {
+			String sql = "SELECT p.id, p.descricao, p.modelo, p.imagem, p.valor, p.desconto, "
+					+ "p.marca_id FROM produto p ORDER BY p.id DESC LIMIT 10";
+
+			stmt = conexao.prepareStatement(sql);
+
+			ResultSet resultado = stmt.executeQuery();
+			FabricaConexao.connectionCommit();
+
+			while (resultado.next()) {
+				Produto produto = new Produto();
+				produto.setId(resultado.getLong("id"));
+				produto.setDescricao(resultado.getString("descricao"));
+				produto.setModelo(resultado.getString("modelo"));
+				produto.setImagem(resultado.getString("imagem"));
+				produto.setValor(resultado.getDouble("valor"));
+				produto.setDesconto(resultado.getDouble("desconto"));
+
+				Marca marca = daoMarca.buscarPorId(resultado.getLong("marca_id")).get();
+				produto.setMarca(marca);
+
+				produtos.add(produto);
+			}
+
+		} catch (SQLException e) {
+			FabricaConexao.connectionRollback();
+			e.printStackTrace();
+		}
+
+		return produtos;
+	}
+	
+	public List<Produto> obterDezProdutosMaioresDescontos() {
+	    List<Produto> produtos = new ArrayList<>();
+
+	    try {
+	        String sql = "SELECT p.id, p.descricao, p.modelo, p.imagem, p.valor, p.desconto, "
+	                + "p.marca_id FROM produto p ORDER BY p.desconto DESC LIMIT 10";
+
+	        stmt = conexao.prepareStatement(sql);
+
+	        ResultSet resultado = stmt.executeQuery();
+	        FabricaConexao.connectionCommit();
+
+	        while (resultado.next()) {
+	            Produto produto = new Produto();
+	            produto.setId(resultado.getLong("id"));
+	            produto.setDescricao(resultado.getString("descricao"));
+	            produto.setModelo(resultado.getString("modelo"));
+	            produto.setImagem(resultado.getString("imagem"));
+	            produto.setValor(resultado.getDouble("valor"));
+	            produto.setDesconto(resultado.getDouble("desconto"));
+
+	            Marca marca = daoMarca.buscarPorId(resultado.getLong("marca_id")).get();
+	            produto.setMarca(marca);
+
+	            produtos.add(produto);
+	        }
+
+	    } catch (SQLException e) {
+	        FabricaConexao.connectionRollback();
+	        e.printStackTrace();
+	    }
+
+	    return produtos;
+	}
+
 
 	public int obterTotalRegistrosPorDescricao(String parteDescricao) {
 		int total = 0;

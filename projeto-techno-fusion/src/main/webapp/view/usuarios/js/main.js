@@ -1,3 +1,16 @@
+
+  function enviarFormulario() {
+      var valor = document.getElementById('valor').value;
+      
+      var form = document.getElementById('formPesquisa');
+      
+      if (valor.trim() !== '' ) {
+		  form.submit();
+      } else {
+        alert('Por favor, insira um valor para realizar a pesquisa');
+      }
+    }
+
 (function($) {
 	"use strict"
 

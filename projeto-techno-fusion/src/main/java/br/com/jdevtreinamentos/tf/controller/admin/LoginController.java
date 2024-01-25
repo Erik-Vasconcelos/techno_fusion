@@ -1,4 +1,4 @@
-package br.com.jdevtreinamentos.tf.controller;
+package br.com.jdevtreinamentos.tf.controller.admin;
 
 import java.io.IOException;
 import java.util.Optional;

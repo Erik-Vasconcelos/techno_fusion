@@ -1,4 +1,4 @@
-package br.com.jdevtreinamentos.tf.controller.display;
+package br.com.jdevtreinamentos.tf.controller.admin.display;
 
 import java.io.IOException;
 
@@ -13,19 +13,19 @@ import br.com.jdevtreinamentos.tf.model.Funcionario;
 
 /**
  * Padrão de projeto POST - REDIRECT - GET Servlet para onde o usuario é
- * redirecionado após realizar o post de salvar/atualizar as credencias e
- * realizar o tratamento das mensagens e retornar para visualização do perfil
+ * redirecionado após realizar o post de salvar/atualizar o funcionario e
+ * realizar o tratamento das mensagens e retorna para visualização do produtos
  * 
  * @author Erik Vasconcelos
- * @since 2024-01-11
- * @version 0.1 2024-01-11
+ * @since 2023-01-12
+ * @version 0.1 2023-01-12
  */
 
-@WebServlet("/funcionario/perfil/display")
-public class PerfilControllerDisplay extends HttpServlet {
+@WebServlet("/produto/display")
+public class ProdutoControllerDisplay extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	public PerfilControllerDisplay() {
+	public ProdutoControllerDisplay() {
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -41,7 +41,7 @@ public class PerfilControllerDisplay extends HttpServlet {
 			request.getSession().removeAttribute("resposta");
 		}
 
-		request.getRequestDispatcher("/funcionario/perfil").forward(request, response);
+		request.getRequestDispatcher("/produto").forward(request, response);
 	}
 
 }
