@@ -1,4 +1,4 @@
-FROM tomcat:9 AS build
+FROM tomcat:9
 
 RUN apt-get update
 RUN apt-get install openjdk-17-jdk -y
@@ -14,6 +14,6 @@ RUN mvn flyway:migrate
 
 EXPOSE 8080
 
-COPY --from=build /target/projeto-techno-fusion-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/
+COPY /target/projeto-techno-fusion-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/
 
 CMD ["catalina.sh", "run"]
