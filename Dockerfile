@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-slim AS builder
+FROM openjdk:17-jdk AS builder
 
 RUN apt-get update && apt-get install -y maven && apt-get clean
 
@@ -15,7 +15,7 @@ RUN mvn clean install -DskipTests=true
 
 RUN mvn flyway:migrate
 
-FROM tomcat:9-jdk17-openjdk-slim
+FROM tomcat:9-jdk17-openjdk
 
 EXPOSE 8080
 

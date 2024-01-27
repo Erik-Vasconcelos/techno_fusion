@@ -1,7 +1,7 @@
 /*################### Adicionado eventos antes de carregar #######################*/
 //Ativa as tabs
 
-$(function () { $('ul-menu > li > a').removeClass('active'); $('#btnPaginaFuncionarios').addClass('active'); });
+$(function() { $('ul-menu > li > a').removeClass('active'); $('#btnPaginaFuncionarios').addClass('active'); });
 
 const triggerTabList = document.querySelectorAll('#nav-tab button')
 triggerTabList.forEach(triggerEl => {
@@ -14,7 +14,7 @@ triggerTabList.forEach(triggerEl => {
 })
 
 //Verifica se houve algum erro, em caso afirmativo muda para a tela de cadastro/atualização 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
 	$("#preloader").show();
 
 	var operacaoErro = $('#operacaoErro').val();
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	$("#preloader").hide();
 });
 
-$(function () {
+$(function() {
 	$('#salario').maskMoney({
 		prefix: 'R$ ',
 		thousands: '.',
@@ -73,12 +73,15 @@ function configurarDadosAbaSalvar() {
 
 		$('#box-img').attr('src', imgString);
 	} else {
-		$('#box-img').attr('src', '/projeto-techno-fusion/view/admin/assets/img/usuario.png');
+		let contexto = window.location.pathname.split('/')[1];
+		let imagemUrl = '/' + contexto + '/view/admin/assets/img/usuario.png';
+
+		$('#box-img').attr('src', imagemUrl);
 	}
 }
 
 function limparAbaSalvarAoMudarAba() {
-	$('#nav-tab button').on('shown.bs.tab', function (e) {
+	$('#nav-tab button').on('shown.bs.tab', function(e) {
 		var abaAtiva = e.target.id;
 
 		var id = $('#id').val();
@@ -102,7 +105,7 @@ function enviarForm() {
 
 function validarCamposRequired() {
 	var camposValidos = true;
-	$('#formFuncionario [required]').each(function () {
+	$('#formFuncionario [required]').each(function() {
 		var valorCampo = $(this).val();
 		if (!valorCampo.trim()) {
 			camposValidos = false;
@@ -142,7 +145,7 @@ function previewImage() {
 		} else {
 			var reader = new FileReader();
 
-			reader.onload = function (e) {
+			reader.onload = function(e) {
 				imagePreview.src = e.target.result;
 			};
 
@@ -150,7 +153,10 @@ function previewImage() {
 		}
 
 	} else {
-		imagePreview.src = '/projeto-techno-fusion/view/admin/assets/img/usuario.png';
+		let contexto = window.location.pathname.split('/')[1];
+		let imagemUrl = '/' + contexto + '/view/admin/assets/img/usuario.png';
+
+		imagePreview.src = imagemUrl;
 	}
 }
 
@@ -166,16 +172,16 @@ function editar(e) {
 		method: "get",
 		url: action + "/editar",
 		data: "id=" + id,
-		success: function (response) {
+		success: function(response) {
 			configDadosEdicao(response);
 
 			setTabEdicao();
 		},
 		timeout: 10000
-	}).done(function () {
+	}).done(function() {
 		$("#preloader").hide();
 
-	}).fail(function (xhr, status, errorThrown) {
+	}).fail(function(xhr, status, errorThrown) {
 		$("#preloader").hide();
 
 		if (xhr.status === 401) {
@@ -234,7 +240,10 @@ function configDadosEdicao(json) {
 		}
 
 	} else {
-		$('#box-img').attr('src', '/projeto-techno-fusion/view/admin/assets/img/usuario.png');
+		let contexto = window.location.pathname.split('/')[1];
+		let imagemUrl = '/' + contexto + '/view/admin/assets/img/usuario.png';
+		$('#box-img').attr('src', imagemUrl);
+
 	}
 
 	$('#email').val(json.email);
@@ -293,7 +302,10 @@ function restaurarTab() {
 	$('#info-tab').text("Informe os dados do funcionário para cadastrá-lo no sistema");
 	$('#nav-profile-tab').text("Cadastrar");
 
-	$('#box-img').attr('src', '/projeto-techno-fusion/view/admin/assets/img/usuario.png');
+	let contexto = window.location.pathname.split('/')[1];
+	let imagemUrl = '/' + contexto + '/view/admin/assets/img/usuario.png';
+	$('#box-img').attr('src', imagemUrl);
+
 	$('#groupSenha').css("display", "block");
 	$('#input-imagem').val("");
 	$('#btnTelefones').attr('disabled', true);
