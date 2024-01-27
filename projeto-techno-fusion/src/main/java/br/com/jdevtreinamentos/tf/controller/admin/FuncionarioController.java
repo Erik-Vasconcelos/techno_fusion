@@ -72,7 +72,7 @@ public class FuncionarioController extends HttpServlet {
 				HttpSession session = request.getSession(false);
 
 				if (session == null || session.isNew()) {
-					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				} else {
 					editar(request, response);
 				}

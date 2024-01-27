@@ -104,7 +104,7 @@ function settarDadosGrafico(json) {
 			data: {
 				labels: json.labels,
 				datasets: [{
-					label: 'Valor médio do produtos em R$ (Reais)',
+					label: 'Valor médio da marca em R$ (Reais)',
 					data: json.dataset,
 					borderWidth: 1,
 					backgroundColor: '#D10024',

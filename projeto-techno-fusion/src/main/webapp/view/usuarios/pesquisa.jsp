@@ -1,3 +1,4 @@
+<%@page import="java.text.DecimalFormat"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -53,12 +54,18 @@ if (valorPesquisa != null && !valorPesquisa.trim().isEmpty()) {
 
 						<c:choose>
 							<c:when test="${not empty pagination.content}">
-
 								<c:forEach items="${pagination.content}" var="p">
-									<div class="col-md-4 col-xs-6">
-										<div class="product">
-											<a
-												href="<%=request.getContextPath()%>/viewProduto?id=${p.id}">
+									<c:set var="valorOriginal"
+										value="${p.valor - (p.valor * (p.desconto / 100))}" />
+									<%
+									double valor = (Double) pageContext.getAttribute("valorOriginal");
+									DecimalFormat df = new DecimalFormat("#,##0.00");
+									String valorFormatado = df.format(valor);
+									%>
+
+									<a href="<%=request.getContextPath()%>/viewProduto?id=${p.id}">
+										<div class="col-md-4 col-xs-6">
+											<div class="product">
 												<div class="product-img">
 													<c:choose>
 														<c:when test="${not empty p.imagem}">
@@ -74,27 +81,24 @@ if (valorPesquisa != null && !valorPesquisa.trim().isEmpty()) {
 														</c:if>
 													</div>
 												</div>
-											</a>
-											<div class="product-body">
-												<p class="product-category">${p.marca.nome}</p>
-												<h3 class="product-name">
-													<a href="#">${p.descricao}</a>
-												</h3>
-												<h4 class="product-price">
-													R$ ${p.valor - (p.valor * (p.desconto / 100))}
-													<del class="product-old-price"> R$ ${p.valor}</del>
-												</h4>
-											</div>
-											<div class="add-to-cart">
-												<a
-													href="<%=request.getContextPath()%>/viewProduto?id=${p.id}">
+
+												<div class="product-body">
+													<p class="product-category">${p.marca.nome}</p>
+													<h3 class="product-name">${p.descricao}</h3>
+
+													<h4 class="product-price">
+														R$
+														<%=valorFormatado%><del class="product-old-price">
+															R$ ${p.valor}</del>
+													</h4>
+												</div>
+												<div class="add-to-cart">
 													<button class="add-to-cart-btn">Ver produto</button>
-												</a>
+												</div>
 											</div>
 										</div>
-									</div>
+									</a>
 								</c:forEach>
-
 							</c:when>
 
 							<c:otherwise>

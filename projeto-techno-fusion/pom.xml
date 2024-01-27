@@ -11,7 +11,6 @@
 		infomártica</description>
 	<dependencies>
 
-
 		<!--##################### BANCO DE DADOS #####################-->
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -61,7 +60,7 @@
 			<version>1.15</version>
 		</dependency>
 
-		<!--##################### Jakson JSON #####################-->
+		<!--##################### Jackson JSON #####################-->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
@@ -89,8 +88,21 @@
 			<version>6.20.6</version>
 		</dependency>
 
-		<!--##################### SERVIDOR TOMCAT #####################-->
+		<!--##################### Flyway #####################-->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>10.5.0</version>
+		</dependency>
 
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+			<version>10.5.0</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!--##################### SERVIDOR TOMCAT #####################-->
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-annotations-api</artifactId>
@@ -259,6 +271,31 @@
 	</dependencies>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<configuration>
+					<url>
+						jdbc:postgresql://localhost:5432/techno_fusion?autoReconnect=true&amp;useTimezone=true&amp;serverTimezone=UTC&amp;useSSL=false</url>
+					<user>postgres</user>
+					<password>postgre2023</password>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.postgresql</groupId>
+						<artifactId>postgresql</artifactId>
+						<version>42.6.0</version>
+
+						<exclusions>
+							<exclusion>
+								<artifactId>slf4j-api</artifactId>
+								<groupId>org.slf4j</groupId>
+							</exclusion>
+						</exclusions>
+					</dependency>
+				</dependencies>
+			</plugin>
+
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>

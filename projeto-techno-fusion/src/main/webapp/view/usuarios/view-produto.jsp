@@ -1,3 +1,4 @@
+<%@page import="java.text.DecimalFormat"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -19,7 +20,7 @@ String contexto = request.getContextPath() + "/view/usuarios/";
 				<!-- NAV -->
 				<ul class="main-nav nav navbar-nav">
 					<li class=""><a href="<%=request.getContextPath()%>">Home</a></li>
-					<li class="active"><a href="#">Produto</a></li>
+					<li class="active"><a>Produto</a></li>
 				</ul>
 				<!-- /NAV -->
 			</div>
@@ -39,6 +40,15 @@ String contexto = request.getContextPath() + "/view/usuarios/";
 				<c:when test="${not empty produto}">
 					<div class="row">
 						<!-- Product main img -->
+
+						<c:set var="valorOriginal"
+							value="${produto.valor - (produto.valor * (produto.desconto / 100))}" />
+						<%
+						double valor = (Double) pageContext.getAttribute("valorOriginal");
+						DecimalFormat df = new DecimalFormat("#,##0.00");
+						String valorFormatado = df.format(valor);
+						%>
+						
 						<div class="col-md-5 col-md-push-2">
 							<div id="product-main-img">
 								<div class="product-preview">
@@ -78,18 +88,14 @@ String contexto = request.getContextPath() + "/view/usuarios/";
 							<div class="product-details">
 								<h2 class="product-name">${produto.descricao}</h2>
 								<div>
-									<h3 class="product-price">
-										R$ ${produto.valor - (produto.valor * (produto.desconto / 100))}
-										<del class="product-old-price">${produto.valor}</del>
+									<h3 class="product-price"><%=valorFormatado%><del class="product-old-price"> ${produto.valor}</del>
 									</h3>
 									<span class="product-available">${produto.marca.nome}</span>
 								</div>
 								<p>${produto.descricao}</p>
 
 								<div class="add-to-cart">
-									<button class="add-to-cart-btn">
-										<i class="fa fa-shopping-cart"></i> |
-									</button>
+									<button class="add-to-cart-btn">|</button>
 								</div>
 
 							</div>
@@ -134,9 +140,16 @@ String contexto = request.getContextPath() + "/view/usuarios/";
 							<div id="tab2" class="tab-pane fade in active">
 								<div class="products-slick" data-nav="#slick-nav-2">
 									<c:forEach items="${produtosTopOfertas}" var="p">
-										<div class="product">
-											<a
-												href="<%=request.getContextPath()%>/viewProduto?id=${p.id}">
+									<c:set var="valorNormal"
+											value="${p.valor - (p.valor * (p.desconto / 100))}" />
+										<%
+										double valor = (Double) pageContext.getAttribute("valorNormal");
+										DecimalFormat df = new DecimalFormat("#,##0.00");
+										String valorFormatado = df.format(valor);
+										%>
+										<a href="<%=request.getContextPath()%>/viewProduto?id=${p.id}">
+											<div class="product">
+
 												<div class="product-img">
 													<c:choose>
 														<c:when test="${not empty p.imagem}">
@@ -153,24 +166,18 @@ String contexto = request.getContextPath() + "/view/usuarios/";
 														</c:if>
 													</div>
 												</div>
-											</a>
-											<div class="product-body">
-												<p class="product-category">${p.marca.nome}</p>
-												<h3 class="product-name">
-													<a href="#">${p.descricao}</a>
-												</h3>
-												<h4 class="product-price">
-													R$ ${p.valor - (p.valor * (p.desconto / 100))}
-													<del class="product-old-price"> R$ ${p.valor}</del>
-												</h4>
-											</div>
-											<div class="add-to-cart">
-												<a
-													href="<%=request.getContextPath()%>/viewProduto?id=${p.id}">
+
+												<div class="product-body">
+													<p class="product-category">${p.marca.nome}</p>
+													<h3 class="product-name">${p.descricao}</h3>
+													<h4 class="product-price"><%=valorFormatado%> <del class="product-old-price"> R$ ${p.valor}</del>
+													</h4>
+												</div>
+												<div class="add-to-cart">
 													<button class="add-to-cart-btn">Ver produto</button>
-												</a>
+												</div>
 											</div>
-										</div>
+										</a>
 									</c:forEach>
 								</div>
 								<div id="slick-nav-2" class="products-slick-nav"></div>

@@ -6,7 +6,9 @@
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-
+		<link rel="apple-touch-icon" sizes="76x76" href="<%=contexto%>img/logo-tf.png">
+  		<link rel="icon" type="image/png" href="<%=contexto%>img/logo-tf.png">
+		
 		<title>Techno Fusion</title>
 
 		<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">

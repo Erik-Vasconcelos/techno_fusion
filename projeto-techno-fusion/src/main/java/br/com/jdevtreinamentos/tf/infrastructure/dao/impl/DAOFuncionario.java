@@ -141,9 +141,6 @@ public class DAOFuncionario implements Serializable, EntidadeGenericaDAO<Funcion
 
 	@Override
 	public Optional<Funcionario> buscarPorId(Long id) {
-		// TODO - criar sistema de encapsulamento do objeto e das informacoes
-		// TODO - criar sistema de geracao de atributos automatico
-
 		Optional<Funcionario> optional = Optional.empty();
 		try {
 			String sql = "SELECT f.id, f.nome, f.sexo, f.data_nascimento, f.perfil, f.email, f.salario, f.imagem, f.login FROM Funcionario f WHERE id = ?";

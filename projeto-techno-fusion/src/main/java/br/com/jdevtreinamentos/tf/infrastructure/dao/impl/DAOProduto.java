@@ -148,12 +148,10 @@ public class DAOProduto implements Serializable, EntidadeGenericaDAO<Produto> {
 				produto.setValor(resultado.getDouble("valor"));
 				produto.setDesconto(resultado.getDouble("desconto"));
 
-				// Recuperar a marca associada ao produto
 				Long marcaId = resultado.getLong("marca_id");
 				Marca marca = daoMarca.buscarPorId(marcaId).get();
 				produto.setMarca(marca);
 
-				// Recuperar o funcionário cadastrador associado ao produto
 				Long cadastradorId = resultado.getLong("cadastrador_id");
 				Funcionario cadastrador = daoFuncionario.buscarNomePorId(cadastradorId).get();
 				produto.setCadastrador(cadastrador);
@@ -190,13 +188,11 @@ public class DAOProduto implements Serializable, EntidadeGenericaDAO<Produto> {
 				produto.setValor(resultado.getDouble("valor"));
 				produto.setDesconto(resultado.getDouble("desconto"));
 
-				// Recuperar a marca associada ao produto
 				Long marcaId = resultado.getLong("marca_id");
 				Marca marca = new Marca();
 				marca.setId(marcaId);
 				produto.setMarca(marca);
 
-				// Recuperar o funcionário cadastrador associado ao produto
 				Long cadastradorId = resultado.getLong("cadastrador_id");
 				Funcionario cadastrador = new Funcionario();
 				cadastrador.setId(cadastradorId);
@@ -315,7 +311,6 @@ public class DAOProduto implements Serializable, EntidadeGenericaDAO<Produto> {
 				Marca marca = daoMarca.buscarPorId(marcaId).get();
 				produto.setMarca(marca);
 
-				// Recuperar o funcionário cadastrador associado ao produto
 				Long cadastradorId = resultado.getLong("cadastrador_id");
 				Funcionario cadastrador = daoFuncionario.buscarNomePorId(cadastradorId).get();
 				produto.setCadastrador(cadastrador);

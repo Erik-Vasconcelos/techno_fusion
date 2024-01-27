@@ -112,7 +112,6 @@ public class DAOTelefone implements Serializable, EntidadeGenericaDAO<Telefone> 
 				telefone.setId(resultado.getLong("id"));
 				telefone.setNumero(resultado.getString("numero"));
 
-				// Recuperar o funcionário associado ao telefone
 				Long funcionarioId = resultado.getLong("funcionario_id");
 				Funcionario funcionario = daoFuncionario.buscarNomePorId(funcionarioId).get();
 
@@ -144,7 +143,6 @@ public class DAOTelefone implements Serializable, EntidadeGenericaDAO<Telefone> 
 				telefone.setId(resultado.getLong("id"));
 				telefone.setNumero(resultado.getString("numero"));
 
-				// Recuperar o funcionário associado ao telefone
 				Long funcionarioId = resultado.getLong("funcionario_id");
 				Funcionario funcionario = new Funcionario();
 				funcionario.setId(funcionarioId);
@@ -216,9 +214,6 @@ public class DAOTelefone implements Serializable, EntidadeGenericaDAO<Telefone> 
 		return totalTelefones;
 	}
 
-	// Adicione outros métodos específicos se necessário
-
-	// Exemplo de método específico para buscar telefones por funcionário
 	public List<Telefone> buscarTelefonesPorFuncionario(Long funcionarioId) {
 		List<Telefone> telefones = new ArrayList<>();
 		try {
@@ -234,7 +229,6 @@ public class DAOTelefone implements Serializable, EntidadeGenericaDAO<Telefone> 
 				telefone.setId(resultado.getLong("id"));
 				telefone.setNumero(resultado.getString("numero"));
 
-				// Recuperar o funcionário associado ao telefone
 				Funcionario funcionario = new Funcionario();
 				funcionario.setId(funcionarioId);
 				telefone.setFuncionario(funcionario);
@@ -251,7 +245,8 @@ public class DAOTelefone implements Serializable, EntidadeGenericaDAO<Telefone> 
 	}
 
 	@Override
-	public Pagination<Telefone> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina, Long idUsuarioLogado) {
+	public Pagination<Telefone> obterRegistrosPaginadosPreview(Integer numeroPagina, Integer registrosPorPagina,
+			Long idUsuarioLogado) {
 		Pagination<Telefone> pagination = new Pagination<>();
 
 		try {
@@ -271,7 +266,6 @@ public class DAOTelefone implements Serializable, EntidadeGenericaDAO<Telefone> 
 				telefone.setId(resultado.getLong("id"));
 				telefone.setNumero(resultado.getString("numero"));
 
-				// Recuperar o funcionário associado ao telefone
 				Long funcionarioId = resultado.getLong("funcionario_id");
 				Funcionario funcionario = new Funcionario();
 				funcionario.setId(funcionarioId);

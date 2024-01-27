@@ -88,7 +88,8 @@ public class ProdutoViewController extends HttpServlet {
 
 		if (valor != null && !valor.trim().isEmpty()) {
 			Pagination<Produto> pagination = null;
-
+			valor = valor.trim();
+			
 			if (pageString != null && !pageString.trim().isEmpty()) {
 				int pagina = Integer.parseInt(pageString);
 
