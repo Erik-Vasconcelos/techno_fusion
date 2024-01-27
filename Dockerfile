@@ -1,6 +1,8 @@
 FROM ubuntu:latest AS builder
 
-RUN apt-get update && apt-get install -y openjdk-17-jdk maven && apt-get clean
+RUN apt-get update && \
+    apt-get install -y openjdk-17-jdk maven && \
+    apt-get clean;
 
 WORKDIR /usr/src/app
 
@@ -11,7 +13,10 @@ ARG DATABASE_URL_MIGRATION
 ARG DATABASE_USERNAME
 ARG DATABASE_PASSWORD
 
-RUN mvn clean install -DskipTests=true
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
+RUN mvn clean install -DskipTests=true -Dfile.encoding=UTF-8
 RUN mvn flyway:migrate
 
 FROM tomcat:9
