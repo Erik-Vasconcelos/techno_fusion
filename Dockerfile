@@ -1,6 +1,6 @@
-FROM openjdk:17-jdk AS builder
+FROM tomcat:9 AS builder
 
-RUN apt-get update && apt-get install -y maven && apt-get clean
+RUN apt-get update && apt-get install -y openjdk-17-jdk && apt-get clean;
 
 COPY . /usr/src/app
 
@@ -14,8 +14,6 @@ ARG DATABASE_PASSWORD
 RUN mvn clean install -DskipTests=true
 
 RUN mvn flyway:migrate
-
-FROM tomcat:9-jdk17-openjdk
 
 EXPOSE 8080
 
