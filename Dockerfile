@@ -19,6 +19,6 @@ FROM tomcat:9-jdk17-openjdk-slim
 
 EXPOSE 8080
 
-COPY --from=builder /usr/src/app/target/projeto-techno-fusion-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/
+COPY --from=builder /usr/src/app/target/projeto-techno-fusion-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/app.war
 
 CMD ["catalina.sh", "run"]
