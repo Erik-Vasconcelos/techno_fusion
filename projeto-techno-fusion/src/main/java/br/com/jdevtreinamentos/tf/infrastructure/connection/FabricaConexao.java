@@ -21,9 +21,9 @@ public class FabricaConexao {
 		public static FabricaConexao instance = new FabricaConexao();
 	}
  
-	private static final String URL = "jdbc:postgresql://localhost:5432/techno_fusion?autoReconnect=true";
-	private static final String USER = "postgres";
-	private static final String PASSWORD = "postgre2023";
+	private static final String URL = System.getenv("DATABASE_URL");
+	private static final String USER = System.getenv("DATABASE_USERNAME");
+	private static final String PASSWORD = System.getenv("DATABASE_PASSWORD");
 	private static Connection connection;
 
 	private FabricaConexao() {

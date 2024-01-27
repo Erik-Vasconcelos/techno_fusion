@@ -1,9 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<!DOCTYPE html>
 <%@ page isErrorPage="true"%>
 
+<!DOCTYPE html>
 <html lang="pt-br">
 <%
 String contexto = request.getContextPath() + "/view";
@@ -11,9 +11,10 @@ String contexto = request.getContextPath() + "/view";
 
 <head>
 <title>Erro</title>
+<meta charset="utf-8">
 <link rel="stylesheet" href="<%=contexto%>/erro-style.css">
 <link rel="icon" type="image/png"
-	href="<%=contexto%>/admin/assets/img/favicon.png">
+	href="<%=contexto%>/admin/assets/img/logo-tf.png">
 </head>
 <link
 	href="https://fonts.googleapis.com/css?family=Encode+Sans+Semi+Condensed:100,200,300,400"
@@ -64,6 +65,5 @@ String contexto = request.getContextPath() + "/view";
 
 	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 </body>
-
 
 </html>

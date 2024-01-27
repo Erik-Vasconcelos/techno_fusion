@@ -57,7 +57,7 @@ public class FuncionarioController extends HttpServlet {
 
 	private static final Double SALARIO_MAXIMO = 100000.0;
 	private static final Integer QTD_MIN_CARACTERES_LOGIN = 5;
-	private static final Integer QTD_MAX_CARACTERES_LOGIN = 8;
+	private static final Integer QTD_MAX_CARACTERES_LOGIN = 20;
 
 	private DAOFuncionario daoFuncionario;
 
