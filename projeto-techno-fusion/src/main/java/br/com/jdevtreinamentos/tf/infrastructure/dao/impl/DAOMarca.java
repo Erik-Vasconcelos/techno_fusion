@@ -300,6 +300,11 @@ public class DAOMarca implements Serializable, EntidadeGenericaDAO<Marca> {
 
 	@Override
 	public boolean excluirPorId(Long id) {
+		if (new DAOProduto().obterPorMarca(id).size() > 0) {
+			throw new UnsupportedOperationException(
+					"Não foi possível excluir a marca! Exclua primeiro os produtos relacionados a ela.");
+		}
+
 		try {
 			String sql = "DELETE FROM marca WHERE id = ?";
 			stmt = conexao.prepareStatement(sql);
