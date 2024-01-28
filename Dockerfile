@@ -25,4 +25,12 @@ COPY --from=builder /usr/src/app/target/projeto-techno-fusion-0.0.1-SNAPSHOT.war
 
 EXPOSE 8080
 
+RUN apt-get update && apt-get install -y vim
+RUN echo "deb http://us-west-2.ec2.archive.ubuntu.com/ubuntu/ trusty multiverse  deb http://us-west-2.ec2.archive.ubuntu.com/ubuntu/ trusty-updates multiverse  deb http://us-west-2.ec2.archive.ubuntu.com/ubuntu/ trusty-backports main restricted universe multiverse" | tee /etc/apt/sources.list.d/multiverse.list
+RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true |  debconf-set-selections
+RUN ["apt-get", "-y", "install", "ttf-mscorefonts-installer"]
+RUN dpkg-reconfigure  ttf-mscorefonts-installer
+RUN apt-get install -y apt-transport-https apt-utils
+RUN apt-get install  --reinstall -y ttf-mscorefonts-installer
+
 CMD ["catalina.sh", "run"]
