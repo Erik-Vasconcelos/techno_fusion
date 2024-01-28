@@ -154,7 +154,7 @@ String contexto = request.getContextPath() + "/view/admin/";
 				<div class="col-md-12">
 					<div class="d-md-flex align-items-center mb-3 mx-2">
 						<div class="mb-md-0 mb-3">
-							<h3 class="font-weight-bold mb-0">Grafico de valor médio por
+							<h3 class="font-weight-bold mb-0">Gráfico de valor médio por
 								marca</h3>
 							<p class="mb-0">Uma visão do valor médio de produtos por
 								marca</p>
